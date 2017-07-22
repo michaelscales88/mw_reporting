@@ -1,0 +1,9 @@
+<!-- Image Upload Area -->
+<div class="input-group">
+    <img src="{{ url_for('avatar', filename=user.avatar|e|safe) if user.avatar else '//placehold.it/100' }}"
+         class="avatar img-circle" alt="avatar">
+    <div class="input-group">
+        <label for="submit_file">Upload a different photo...</label>
+        <input id="submit_file" type="file" class="form-control" name="user_image">
+    </div>
+</div>

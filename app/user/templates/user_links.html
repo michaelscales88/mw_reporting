@@ -1,0 +1,35 @@
+<!-- Links section -->
+<form class="form-group" role="form" method="POST" target="">
+    <div class="container-fluid">
+        {% for link in user.links %}
+            <div class="input-group">
+                <label for="{{ link.link_type|e }}-link" class="control-label">{{ link.link_type|e }} link:</label>
+                <input id="{{ link.link_type|e }}-link" class="form-control" type="text" placeholder="{{ link.link|e }}">
+                <button id="{{ link.link_type|e }}-link" class="btn btn-default"
+                        name="edit" value="{{ link.link|e }}" aria-label="Left Align">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                </button>
+                <button id="{{ link.link_type|e }}-link" class="btn btn-default"
+                        name="remove" value="{{ link.link|e }}" aria-label="Left Align">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="container-fluid">
+        <div class="input-group">
+            <label for="link-type" class="control-label">Link type:</label>
+            <input id="link-type" class="form-control" type="text" placeholder="Type" name="link_type">
+        </div>
+        <div class="input-group">
+            <label for="link-proper" class="control-label">Link:</label>
+            <input id="link-proper" class="form-control" type="text" placeholder="Link" name="link_proper">
+        </div>
+        <div class="input-group">
+            <label for="add-link" class="control-label">Add link:</label>
+            <button class="btn btn-default" type="submit" id="add-link">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            </button>
+        </div>
+    </div>
+</form>

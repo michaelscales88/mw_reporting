@@ -1,0 +1,13 @@
+<!-- Default content page -->
+{% extends 'base.html' %}
+
+{% block head %}
+    {{ super() }}
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('report.static', filename='report_index.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+
+    </div>  <!-- /.container-fluid -->
+{% endblock %}

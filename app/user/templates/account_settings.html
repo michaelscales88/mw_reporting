@@ -1,0 +1,34 @@
+<!-- User profile info -->
+<div class="input-group">
+    <label for="first_name" class="control-label">First name:</label>
+    <input id="first_name" class="form-control" type="text" placeholder="{{ user.first_name }}" name="first_name">
+</div>
+<div class="input-group">
+    <label for="last_name" class="control-label">Last name:</label>
+    <input id="last_name" class="form-control" type="text" placeholder="{{ user.last_name }}" name="last_name">
+</div>
+<div class="input-group">
+    <label for="username" class="control-label">Username (Email):</label>
+    <input id="username" class="form-control" type="text" placeholder="{{ user.email }}" name="email">
+</div>
+<div class="input-group">
+    <label for="password" class="control-label">Password: </label>
+    <input id="password" class="form-control" type="password" placeholder="11111122333" name="password">
+</div>
+<div class="input-group">
+    <label for="confirm_password" class="control-label">Confirm Password: </label>
+    <input id="confirm_password" class="form-control" type="password" placeholder="11111122333" name="password_confirm">
+</div>
+<div class="input-group">
+    <label for="user-time-zone" class="control-label">Time Zone:</label>
+    <select class="form-control" id="user-time-zone" name="time-zone">
+        <option value="Hawaii">(GMT-10:00) Hawaii</option>
+        <option value="Alaska">(GMT-09:00) Alaska</option>
+        <option value="Pacific Time (US &amp; Canada)">(GMT-08:00) Pacific Time (US &amp; Canada)</option>
+        <option value="Arizona">(GMT-07:00) Arizona</option>
+        <option value="Mountain Time (US &amp; Canada)">(GMT-07:00) Mountain Time (US &amp; Canada)</option>
+        <option value="Central Time (US &amp; Canada)" selected="selected">(GMT-06:00) Central Time (US &amp; Canada)</option>
+        <option value="Eastern Time (US &amp; Canada)">(GMT-05:00) Eastern Time (US &amp; Canada)</option>
+        <option value="Indiana (East)">(GMT-05:00) Indiana (East)</option>
+    </select>
+</div>

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block head %}
+    {{ super() }}
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('user.static', filename='login.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <h1>Sign In</h1>
+        <form action="" method="POST" name="login">
+            {{ form.hidden_tag() }}
+            <article>
+                <section>
+                    <code>{{ form.login(class="form-control", placeholder="Login") }}</code>
+                    <code>{{ form.password(class="form-control", placeholder="Password") }}</code>
+                    <code>
+                        {{ form.remember_me }} Remember Me
+                        <button class="btn" type="submit" value="login">Login</button>
+                    </code>
+                </section>
+            </article>
+            <input type=hidden value="{{ next or '' }}" name=next>
+        {% if form.login.errors %}
+            <aside>
+                <code>
+                    {% for error in form.login.errors %}
+                        <span style="color: red;">[{{error}}]</span>
+                    {% endfor %}
+                </code>
+            </aside>
+        {% endif %}
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,43 @@
+<!-- Navigation bar for all base pages -->
+{#<style>#}
+{#    .navbar {#}
+{#    padding: 5px;#}
+{#    border: 5px;#}
+{#    border-radius: 10px;#}
+{#    margin-bottom: 0;#}
+{#    font-size: 12px;#}
+{#    letter-spacing: 5px;#}
+{#    }#}
+{##}
+{#    .navbar-nav li a:hover {#}
+{#        color: #1abc9c !important;#}
+{#    }#}
+{#</style>#}
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">   <!-- Maximum screen width -->
+
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <p class="base-navbar">{% include 'navigation/header.html' %}</p>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <ul class="nav navbar-nav collapse navbar-collapse" id="base-navbar">
+
+            <!-- Public contact information -->
+            <li class="base-navbar">{% include 'navigation/public.html' %}</li>
+
+            <!-- If search enabled display the search form -->
+            {% if g.search_enabled %}
+                <li class="base-navbar">{% include 'navigation/search.html' %}</li>
+            {% endif %}
+
+            <!-- Display login options -->
+            {% if g.user.is_authenticated %}
+                <li class="base-navbar">{% include 'navigation/authenticated_user.html' %}</li>
+            {% else %}
+                <li class="base-navbar">{% include 'navigation/public_user.html' %}</li>
+            {% endif %}
+
+        </ul>
+    </div><!-- /.container-fluid -->
+</nav>

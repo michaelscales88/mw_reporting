@@ -1,0 +1,28 @@
+<!-- Index to blueprint index pages -->
+{% extends 'base.html' %}
+
+{% block head %}
+    {{ super() }}
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static', filename='index.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid padded">
+        {% if blueprints %}
+            <h1>mW Reporting</h1>
+            <section>
+                {% for blueprint in blueprints %}
+                    <div class="input-group">
+                        <h3><a href="{{ url_for('{bp}.index'.format(bp=blueprint)) }}">{{ blueprint }}</a></h3>
+                    </div>
+                {% endfor %}
+            </section>
+        {% else %}
+            <section>
+                <p>
+                    Else
+                </p>
+            </section>
+        {% endif %}
+    </div>  <!-- /.container-fluid -->
+{% endblock %}

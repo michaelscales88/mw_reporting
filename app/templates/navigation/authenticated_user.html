@@ -1,0 +1,15 @@
+<!-- Display authenticated user options-->
+<div class="navbar-link navbar-text dropdown">
+    Signed in as {{ g.user.email }}
+
+    <button type="button" id="userButtons" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="caret"></span>
+        <span class="sr-only">Toggle User Options</span>
+    </button>
+
+    <div class="dropdown-menu" aria-labelledby="userButtons">
+        <!-- Dropdown menu links -->
+        <a class="dropdown-item btn" href="{{ url_for('user.settings') }}">Settings</a>
+        <a class="dropdown-item btn" href="{{ url_for('user.logout') }}">Logout</a>
+    </div>
+</div>
