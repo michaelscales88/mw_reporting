@@ -9,8 +9,9 @@
     <option name="TEMPLATE_CONFIGURATION" value="Jinja2" />
     <option name="TEMPLATE_FOLDERS">
       <list>
-        <option value="$USER_HOME$/local/mWreporting/app/templates" />
-        <option value="$USER_HOME$/local/mWreporting/app/user/templates" />
+        <option value="$MODULE_DIR$/app/templates" />
+        <option value="$MODULE_DIR$/app/report/templates" />
+        <option value="$MODULE_DIR$/app/user/templates" />
       </list>
     </option>
   </component>

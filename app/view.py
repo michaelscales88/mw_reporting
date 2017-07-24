@@ -1,9 +1,22 @@
 from datetime import datetime
-from flask import render_template, g, current_app
-from flask_login import current_user, login_required
+from flask import render_template, g, current_app, url_for, redirect
+from flask_login import current_user
 
 from app import app
 from app.database import db_session
+
+
+@app.route('/')
+def catch_all():
+    return redirect(
+        url_for('index')
+    )
+
+
+# Avoid favicon 404
+@app.route("/favicon.ico", methods=['GET'])
+def favicon():
+    return url_for('static', filename='favicon.ico')
 
 
 @app.route('/index', methods=['GET', 'POST'])

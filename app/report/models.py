@@ -21,9 +21,10 @@ class CallTable(Base):
     end_time = Column(DateTime)
     system_id = Column(Integer)
     caller_id = Column(Text)
+    inbound_route = Column(Text)
 
     # parent-child relationship
-    events = relationship("EventTable", back_populates='call_id')   # Iterable of EventTable objects
+    events = relationship("EventTable", back_populates='call')   # Iterable of EventTable objects
 
     @declared_attr
     def __tablename__(cls):
@@ -35,6 +36,16 @@ class CallTable(Base):
         return """SELECT * FROM c_call WHERE to_char(c_call.start_time, 'YYYY-MM-DD') = '{date}'""".format(
             date=request_date
         )
+
+    def add_event(self, event):
+        if not self.tracked(event, self.events):
+            self.events.append(event)
+            return self
+
+    def remove_event(self, event):
+        if self.tracked(event, self.events):
+            self.events.remove(event)
+            return self
 
 
 @generic_repr
@@ -66,6 +77,6 @@ class EventTable(Base):
     @staticmethod
     def src_statement(request_date):
         """Get src rows by running select * from table_name"""
-        return """SELECT * FROM c_event WHERE to_char(c_call.start_time, 'YYYY-MM-DD') = '{date}'""".format(
+        return """SELECT * FROM c_event WHERE to_char(c_event.start_time, 'YYYY-MM-DD') = '{date}'""".format(
             date=request_date
         )

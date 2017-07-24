@@ -6,12 +6,11 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container-fluid">
-        <h1>Sign In</h1>
+    <div class="container-fluid padded">
         <form action="" method="POST" name="login">
             {{ form.hidden_tag() }}
-            <article>
                 <section>
+                    <h1>Sign In</h1>
                     <code>{{ form.login(class="form-control", placeholder="Login") }}</code>
                     <code>{{ form.password(class="form-control", placeholder="Password") }}</code>
                     <code>
@@ -19,7 +18,6 @@
                         <button class="btn" type="submit" value="login">Login</button>
                     </code>
                 </section>
-            </article>
             <input type=hidden value="{{ next or '' }}" name=next>
         {% if form.login.errors %}
             <aside>

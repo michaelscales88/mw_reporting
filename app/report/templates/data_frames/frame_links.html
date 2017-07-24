@@ -1,0 +1,14 @@
+<!-- Display links for traversing frames -->
+{% if table.has_prev %}
+    <a href="{{ url_for('report.index', page=table.prev_num) }}">
+        &lt;&lt; Back</a>
+{% else %}
+    &lt;&lt; Back
+{% endif %} |
+
+{% if table.has_next %}
+    <a href="{{ url_for('report.index', page=table.next_num) }}">
+        Next &gt;&gt;</a>
+{% else %}
+    Next &gt;&gt;
+{% endif %} |

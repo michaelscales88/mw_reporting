@@ -16,30 +16,30 @@ header  {
 }
 section {
   float: left;
-  width: 50%;
+  width: 90%;
 }
 aside {
   float: right;
-  width: 50%;
+  width: 10%;
 }
 footer {
   clear: both;
   margin-bottom: 0;
 }
-
-input[type="file"]{
-        height:50px;
-}
-
-input[type="file"]::-webkit-file-upload-button{
-    height:50px;
-}
-
 .padded {
     padding: 50px;
 }
 
-.form-group {
-    width: 100%;
-    clear: both;
+/*Pandas Configuration*/
+table.dataframe, .dataframe th, .dataframe td {
+  border: none;
+  border-bottom: 1px solid #C8C8C8;
+  border-collapse: collapse;
+  text-align:left;
+  padding: 10px;
+  margin-bottom: 40px;
+  font-size: 0.9em;
 }
+tr:nth-child(odd)		{ background-color:#eee; }
+tr:nth-child(even)	{ background-color:#fff; }
+tr:hover            { background-color: #ffff99;}
