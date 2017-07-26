@@ -1,6 +1,6 @@
-from flask import Flask
 from flask_login import LoginManager
-
+from flask_moment import Moment
+from .flask_extended import Flask
 
 # store private information in instance
 app = Flask(__name__, instance_relative_config=True, static_folder='static', template_folder='templates')
@@ -8,6 +8,8 @@ app = Flask(__name__, instance_relative_config=True, static_folder='static', tem
 
 # Load default templates
 app.config.from_object('app.default_config.DevelopmentConfig')
+app.config.from_yaml('clients.yml', silent=True)
+app.config.from_yaml('secret_stuff.yml', silent=True)
 
 
 # Start the index service
@@ -20,6 +22,10 @@ if app.config['ENABLE_SEARCH']:
 lm = LoginManager()
 lm.init_app(app)
 lm.login_view = 'user.login'
+
+
+# Render UTC dates based on browser settings
+moment = Moment(app)    # Also nice jquery and moment import
 
 
 # Import base view

@@ -47,6 +47,10 @@ class CallTable(Base):
             self.events.remove(event)
             return self
 
+    @staticmethod
+    def tracked(event, events):
+        return event in events
+
 
 @generic_repr
 class EventTable(Base):

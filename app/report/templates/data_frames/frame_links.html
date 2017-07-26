@@ -1,4 +1,7 @@
 <!-- Display links for traversing frames -->
+{% if table %}
+    {{ table.displaying }} |
+{% endif %}
 {% if table.has_prev %}
     <a href="{{ url_for('report.index', page=table.prev_num) }}">
         &lt;&lt; Back</a>

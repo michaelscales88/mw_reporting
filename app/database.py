@@ -5,10 +5,23 @@ from redpanda.orm import sessionmaker
 
 from app import app
 
+# Internal db
 engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))
+
+# Internal db
+pg_engine = create_engine(app.config['PG_CONNECTION'])
+pg_session = scoped_session(sessionmaker(autocommit=False,
+                                         autoflush=False,
+                                         bind=pg_engine))
+
+# MS SQL db
+ms_engine = create_engine(app.config['MSSQL_CONNECTION'])
+ms_session = scoped_session(sessionmaker(autocommit=False,
+                                         autoflush=False,
+                                         bind=ms_engine))
 
 Base = declarative_base()
 Base.query = db_session.query_property()

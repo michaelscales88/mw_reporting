@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block extracss %}
+    {{ super() }}
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('report.static', filename='report.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid padded">
+        <div class="container-fluid text-centered padded">
+            <header>
+                <h1>{{ tablename }}</h1>
+            </header>
+            {% include 'data_frames/data_frame.html' %}
+        </div>
+
+    </div>  <!-- /.container-fluid -->
+{% endblock %}

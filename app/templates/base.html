@@ -4,46 +4,55 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap -->
-
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-    <!-- jQuery library -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
-
-    <link rel="shortcut icon" href="{{ url_for('favicon') }}" type="image/x-icon" />
-
-
     {% if title %}
         <title>{{ title }} - mW Reporting</title>
     {% else %}
         <title>mW Reporting</title>
     {% endif %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{% block head_description %}{% endblock %}">
+    <meta name="author" content="{% block head_author %}{% endblock %}">
 
-    <!-- Allows page specific JS and CSS -->
-    {% block head %}
-    {% endblock %}
+    <!-- Styles
+    ================================================== -->
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static', filename='style.css') }}">
+
+    <link rel="shortcut icon" href="{{ url_for('favicon') }}" type="image/x-icon" />
+
+    <!-- Allows page specific CSS -->
+    {% block extracss %}{% endblock %}
 </head>
 
 <body>
-<!-- Navigation bar for all base pages -->
-{% include 'navigation/navigation.html' %}
 
-<!-- Page specific content -->
-<div class="container-fluid">
+    <!-- Navigation bar for all base pages -->
+    {% include 'navigation/navigation.html' %}
+
+    <!-- Page specific content -->
     {% block content %}{% endblock %}
-</div>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+    <!-- Configure moment -->
+    {{ moment.include_jquery(version='3.2.1') }}
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <!-- jQuery library for DatePicker -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+
+    {{ moment.include_moment() }}
+
+    {% block extrajs %}{% endblock %}
 
 </body>
 
@@ -57,4 +66,5 @@
         {% include 'message.html' %}
     </div>
 </footer>
+
 </html>

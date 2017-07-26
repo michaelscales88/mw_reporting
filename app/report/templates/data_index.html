@@ -1,0 +1,67 @@
+<!-- Default content page -->
+{% extends 'base.html' %}
+
+{% block extracss %}
+    {{ super() }}
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('report.static', filename='report.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid padded">
+        <div class="container-fluid inline padded">
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#frameModal">
+                Query Settings
+            </button>
+            {% include 'data_frames/frame_modal.html' %}
+        </div>
+        <div class="container-fluid text-centered padded">
+            <header>
+                <h1>{{ tablename }}</h1>
+            </header>
+            {% include 'data_frames/data_frame.html' %}
+
+            <footer>
+                <code>
+                    {% include 'data_frames/frame_links.html' %}
+                </code>
+            </footer>
+        </div>
+
+    </div>  <!-- /.container-fluid -->
+{% endblock %}
+
+{% block extrajs %}
+    {{ super() }}
+    <!-- Include Date Range Picker -->
+    <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+
+    <script type="text/javascript">
+        $(function() {
+
+            let start = moment().subtract(29, 'days');
+            let end = moment();
+
+            function cb(start, end) {
+                $('#report_range').find('span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            }
+
+            $('#report_range').daterangepicker({
+                startDate: start,
+                endDate: end,
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+
+            cb(start, end);
+
+        });
+    </script>
+{% endblock %}

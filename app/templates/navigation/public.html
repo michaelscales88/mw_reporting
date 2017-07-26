@@ -1,16 +1,17 @@
 <!-- Public contact information  -->
 <div class="navbar-link navbar-text dropdown">
-    <a href="#">Artist</a>
+    <a href="{{ url_for('report.index') }}">Reports</a>
 
     <button type="button" id="publicButtons" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <span class="caret"></span>
         <span class="sr-only">Toggle Artist Page</span>
     </button>
 
-    <div class="dropdown-menu" aria-labelledby="publicButtons">
+    <ul class="dropdown-menu" aria-labelledby="publicButtons" role="menu">
         <!-- Dropdown menu links -->
-        <a class="dropdown-item btn" href="#">Merchandise</a>
-        <a class="dropdown-item btn" href="#">Instagram</a>
-{#        <a class="dropdown-item btn" href="#">Twitter</a>#}
-    </div>
+        <li><a class="dropdown-item btn" href="#">My Report</a></li>
+        <li><a class="dropdown-item btn" href="#">My Report</a></li>
+        <li class="divider"></li>
+        <li><a class="dropdown-item btn" href="{{ url_for('report.run') }}">Basic Report</a></li>
+    </ul>
 </div>

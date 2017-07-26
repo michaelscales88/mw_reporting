@@ -26,8 +26,3 @@ def is_safe_url(target):
         test_url.scheme in ('http', 'https')
         and ref_url.netloc == test_url.netloc
     )
-
-
-def results_to_dict(ptr):
-    col_names = [item[0] for item in ptr._cursor_description()]
-    return [dict(zip(col_names, row)) for row in ptr]   # Column: Cell pairs

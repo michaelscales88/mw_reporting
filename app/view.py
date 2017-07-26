@@ -3,7 +3,7 @@ from flask import render_template, g, current_app, url_for, redirect
 from flask_login import current_user
 
 from app import app
-from app.database import db_session
+from app.database import db_session, pg_session
 
 
 @app.route('/')
@@ -24,7 +24,6 @@ def index():
     print('base index')
     # User module is accessed through the navigation bar
     loaded_modules = [name for name in current_app.blueprints.keys() if name != 'user']
-    print(loaded_modules)
     return render_template(
         'index.html',
         title='Index',
@@ -37,6 +36,7 @@ def before_request():
     print('setup')
     g.user = current_user
     g.session = db_session
+    g.foreign_session = pg_session
     g.search_enabled = current_app.config['ENABLE_SEARCH']
     if g.user.is_authenticated:
         g.user.last_seen = datetime.utcnow()
@@ -44,19 +44,22 @@ def before_request():
     #     si.register_class(User)  # update whoosh
 
 
-@app.teardown_request
-def teardown(error):
-    print('teardown')
-    session = getattr(g, 'session', None)
-    # Only commit if we get this far
-    if session:
-        session.commit()
+# @app.teardown_request
+# def teardown(error):
+#     print('teardown')
+#     session = getattr(g, 'session', None)
+#
+#     # Only commit if we get this far
+#     if session:
+#         session.commit()
+#         print('Committed')
 
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
-    print('absolute session end')
-    db_session.remove()     # Be certain than the session closes
+    db_session.remove()
+    pg_session.remove()
+    print('absolute session end', flush=True)
 
 
 @app.errorhandler(404)
