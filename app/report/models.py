@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Text, DateTime, Integer, ForeignKey
+from sqlalchemy import Column, Text, DateTime, Integer, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import generic_repr
@@ -84,3 +84,18 @@ class EventTable(Base):
         return """SELECT * FROM c_event WHERE to_char(c_event.start_time, 'YYYY-MM-DD') = '{date}'""".format(
             date=request_date
         )
+
+
+@generic_repr
+class ClientTable(Base):
+
+    id = Column(Integer, primary_key=True)
+    client_id = Column(Integer, unique=True, nullable=False)
+    client_name = Column(Integer, unique=True, nullable=False)
+    full_service = Column(Boolean, default=False)
+
+    @declared_attr
+    def __tablename__(cls):
+        return cls.__name__.lower()
+
+

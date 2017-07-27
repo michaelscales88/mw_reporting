@@ -209,8 +209,6 @@ def sla_report(records, client_list=None):
                 test_output['Summary', 'Average Wait Lost'] += call_duration
 
             elif call_duration > timedelta(seconds=20):
-                # if record.unique_id1 == test_client:
-                #     print('I am a lost call', record.id)
                 test_output[row_name, 'I/C Presented'] += 1
                 test_output[row_name, 'I/C Abandoned'] += 1
                 test_output[row_name, 'Average Wait Lost'] += call_duration

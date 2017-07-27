@@ -1,5 +1,10 @@
-{% if table %}
-    {{ table.frame.to_html()|safe }}
-{% else %}
-    ...
-{% endif %}
+<table cellpadding="10px" width="100%">
+    <thead id="column-names">
+    </thead>
+
+    <tbody id="table-body">
+    </tbody>
+
+    <tfoot id="column-names">
+    </tfoot>
+</table>

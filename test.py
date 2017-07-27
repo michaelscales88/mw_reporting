@@ -1,6 +1,6 @@
 from app.database import sessionmaker, scoped_session, create_engine
 from app import app
-from app.core import results_to_dict
+from app.report.core import results_to_dict
 
 
 engine = create_engine(app.config['MSSQL_CONNECTION'])

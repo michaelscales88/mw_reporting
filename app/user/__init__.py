@@ -4,5 +4,5 @@ from app import lm
 
 
 @lm.user_loader
-def load_user(id):
-    return User.get(id=int(id))
+def load_user(uid):
+    return User.get(id=int(uid))

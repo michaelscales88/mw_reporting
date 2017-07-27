@@ -1,12 +1,29 @@
 from sqlalchemy.inspection import inspect
-from sqlite3 import ProgrammingError
-from sqlalchemy.sql import func
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.sql import func, and_
 from flask import current_app
 from app.report.sla_report import cache, sla_report
 from pandas import DataFrame
 from dateutil.parser import parse
-from app.decorators import run_async
+from .processes import get_records
+
+
+def query_by_date(session, call_table, date):
+    return session.query(call_table).filter(
+                and_(
+                    call_table.call_direction == 1,
+                    func.date(call_table.start_time) == func.date(date)
+                )
+            )
+
+
+def query_by_range(session, call_table, start, end):
+    return session.query(call_table).filter(
+                and_(
+                    call_table.call_direction == 1,
+                    func.date(call_table.start_time) >= func.date(start),
+                    func.date(call_table.start_time) <= func.date(end)
+                )
+            )
 
 
 def get_count(query):
@@ -78,64 +95,19 @@ def parse_date_range(date_range):
     return parse(start), parse(end)
 
 
-def results_to_dict(ptr):
-    col_names = [item[0] for item in ptr._cursor_description()]
-    return [dict(zip(col_names, row)) for row in ptr]   # Column: Cell pairs
-
-
-def record_retriever(session, foreign_session, models, dates):
+def record_retriever(models, dates):
 
     CallTable = models.get('calltable')
     EventTable = models.get('eventtable')
 
     worker_threads = []
     for get_date in dates:
-        worker = get_records(session, foreign_session, CallTable, EventTable, get_date)
-        worker_threads += [worker]
-    worker_threads = [thread.join() for thread in worker_threads]
+        with current_app.app_context():
+            worker = get_records(CallTable, EventTable, get_date)
+            worker_threads += [worker]
+        print('added work')
+    # worker_threads = [thread.join() for thread in worker_threads]
     print('joined threads')
 
     print(worker_threads)
-    # session.commit()
-    # foreign_session.remove()
     print('claiming I added records', flush=True)
-
-
-@run_async
-def get_records(session, foreign_session, call_model, event_model, get_date):
-    if call_model and event_model:
-        # Get records by date
-        call_statement = call_model.src_statement(get_date)
-        event_statement = event_model.src_statement(get_date)
-
-        # Get records for the CallTable
-        call_data_ptr = foreign_session.execute(call_statement)
-        call_data_records = results_to_dict(call_data_ptr)  # Returns list of dicts
-
-        # Get records for the EventTable
-        event_data_ptr = foreign_session.execute(event_statement)
-        event_data_records = results_to_dict(event_data_ptr)  # Returns list of dicts
-
-        # Convert event: records -> event model -> event
-        event_data = [event_model(**event_record) for event_record in event_data_records]
-
-        for foreign_record in call_data_records:
-            call = call_model(**foreign_record)
-
-            # this sucks right now
-            for call_event in [call_event for call_event in event_data
-                               if call_event.call_id == call.call_id]:
-                call.add_event(call_event)
-
-            # Add foreign records to current session
-            session.add(call)
-        try:
-            session.commit()
-        except IntegrityError:
-            print('Records exist.')
-        except ProgrammingError:
-            """
-            sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread.The object was created in thread id 123145377161216 and this is thread id 123145382416384
-            Gotta fix this when there is a constraint issue TODO
-            """
-            print('Records exist or something with threading.')

@@ -14,13 +14,13 @@
                         <input title="report_range" id="report_range" type="text" name="report_range"
                                class="form-control" style="cursor: pointer;" aria-describedby="report_range">
                         <span class="input-group-addon" id="report_range">
-                            <span class="glyphicon glyphicon-calendar fa fa-calendar" aria-hidden="true"></span>
+                            <span class="glyphicon glyphicon-calendar fa fa-calendar" aria-hidden="true">&nbsp;</span>
                         </span>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" formaction="{{ url_for('report.index') }}">Save changes</button>
+                    <button type="button" class="btn btn-primary" id="change_range">Save</button>
                     <button type="submit" class="btn btn-primary" formaction="{{ url_for('report.run') }}">Run</button>
                 </div>
             </form>

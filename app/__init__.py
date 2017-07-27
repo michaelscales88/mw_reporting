@@ -2,6 +2,7 @@ from flask_login import LoginManager
 from flask_moment import Moment
 from .flask_extended import Flask
 
+
 # store private information in instance
 app = Flask(__name__, instance_relative_config=True, static_folder='static', template_folder='templates')
 

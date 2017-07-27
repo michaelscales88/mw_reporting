@@ -1,4 +1,4 @@
-<!-- Default content page -->
+<!-- Index page for data in report module -->
 {% extends 'base.html' %}
 
 {% block extracss %}
@@ -23,7 +23,7 @@
 
             <footer>
                 <code>
-                    {% include 'data_frames/frame_links.html' %}
+                    {#                    {% include 'data_frames/frame_links.html' %}#}
                 </code>
             </footer>
         </div>
@@ -37,17 +37,61 @@
     <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
     <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
 
-    <script type="text/javascript">
-        $(function() {
 
-            let start = moment().subtract(29, 'days');
+    <script type="text/javascript">
+        $(document).ready(function() {
+            let start = moment().subtract(1, 'days');
             let end = moment();
+            let $table = $('tbody#table-body');
+            let $columns = $('#column-names');
 
             function cb(start, end) {
                 $('#report_range').find('span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
             }
 
-            $('#report_range').daterangepicker({
+            function submit_form() {
+
+                let ajax_url = "{{ url_for('report.ajax') }}";
+                let params = {
+                    report_range: $('input[name="report_range"]').val()
+                };
+
+                /* Ajax call for report module */
+                $.getJSON(ajax_url, params, function (data, status) {
+
+                    /* Dismiss modal once query properties are selected */
+                    $('#frameModal').modal('hide');
+
+                    if (status === "success") {
+
+                        /* Create the column headers/footers */
+                        $columns.empty();
+                        let $row = $('<tr>').appendTo($columns);
+
+                        $.each(data[0], function(k, v) {
+                                $('<th>')
+                                    .text(k)
+                                    .appendTo($row);
+                        });
+
+                        /* Create the table-body rows and cells */
+                        $table.empty(); // empty is more explicit
+                        $.each(data, function() {
+                            let $row = $('<tr>').appendTo($table);
+
+                            $.each(this, function(k, v) {
+                                $('<td>')
+                                    .text(v)
+                                    .appendTo($row);
+                            });
+                        });
+                    }
+                });
+            }
+
+            $('button#change_range').bind('click', submit_form);
+
+            $('input#report_range').daterangepicker({
                 startDate: start,
                 endDate: end,
                 ranges: {
@@ -57,11 +101,11 @@
                     'Last 30 Days': [moment().subtract(29, 'days'), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
                     'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-                }
+                },
+                useCurrent: true
             }, cb);
 
-            cb(start, end);
-
-        });
+            cb(start, end); /* Init the report_range */
+        });     /* closing $(document).ready */
     </script>
 {% endblock %}

@@ -1,13 +1,6 @@
+# Boilerplate threading
 from threading import Thread
 from functools import wraps
-
-
-def async(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        thr = Thread(target=f, args=args, kwargs=kwargs)
-        thr.start()
-    return wrapper
 
 
 def run_async(func):
@@ -32,12 +25,10 @@ def run_async(func):
     t1.join()
     t2.join()
     """
-    from threading import Thread
-    from functools import wraps
 
     @wraps(func)
     def async_func(*args, **kwargs):
-        func_hl = Thread(target = func, args = args, kwargs = kwargs)
+        func_hl = Thread(target=func, args=args, kwargs=kwargs)
         func_hl.start()
         return func_hl
 
