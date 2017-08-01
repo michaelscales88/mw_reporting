@@ -1,7 +1,6 @@
-from flask import render_template, g, Blueprint, request, jsonify, make_response
+from flask import render_template, g, Blueprint, jsonify
 from flask_login import login_required
-from datetime import datetime, timedelta
-from json import dumps, loads
+from json import dumps
 
 # App imports
 from app.core import get_redirect_target
@@ -9,9 +8,7 @@ from app.core import get_redirect_target
 # Module imports
 from . import excel
 from .models import CallTable, EventTable
-# from .schemas import CallSchema
-from .pandas_page import PandasPage
-from .core import meta_frame, run_report, parse_date_range, record_retriever, get_count, query_by_date, query_by_range
+from .core import configure_query, run_report, get_query
 
 bp = Blueprint(
     'report',
@@ -23,108 +20,47 @@ bp = Blueprint(
 
 
 @bp.route('/report', methods=['GET', 'POST'])
-@bp.route('/report/<int:page>', methods=['GET', 'POST'])
 @login_required
-def index(page=1):
+def index():
     next = get_redirect_target()
-    # report_range = request.form.get('report_range')
-    # print('Entered report index', report_range)
-    # print(request.method)
-    # print(request.args)
-    #
-    # if request.method == 'POST' and report_range:
-    #
-    #     # Set up view query if not redirecting
-    #     start, end = parse_date_range(report_range)
-    #
-    #     # Check if the records need to be retrieved
-    #     start_date = start.date()
-    #     end_date = end.date()
-    #
-    #     dates = []
-    #     print('checking dates')
-    #     while start_date <= end_date:
-    #
-    #         # Cheaper lookup to see if we need to get a days worth of records
-    #         query = query_by_date(g.session, CallTable, start_date)
-    #         total = get_count(query)
-    #
-    #         # Only the current day can continually update
-    #         if start_date == datetime.today().date() or total == 0:
-    #             print('adding retrieval date for', start_date, total)
-    #             dates += [start_date]
-    #
-    #         start_date += timedelta(days=1)
-    #
-    #     if dates:
-    #         print('getting some dates')
-    #         # record_retriever(
-    #         #     {
-    #         #         CallTable.__tablename__: CallTable,
-    #         #         EventTable.__tablename__: EventTable
-    #         #     },
-    #         #     dates
-    #         # )
-    #
-    #     # Get request records to display
-    #     print('getting records to display')
-    #     query = query_by_range(g.session, CallTable, start, end)
-    # else:
-    #     report_range = datetime.today().replace(day=5).date()
-    #     query = query_by_date(g.session, CallTable, report_range)
-    #
-    # # Paginated data frame
-    # panda_frame = PandasPage(
-    #     # Logic for changing the query
-    #     **meta_frame(page, query, CallTable)
-    # )
-    # panda_frame.frame.name = report_range
-    return render_template(
-        'data_index.html',
-        title='Data Gallery',
-        next=next,
-        # table=panda_frame,
-        columns=list(CallTable.__table__.columns.keys()),
-        tablename='SLA REPORT'
-    )
-
-
-@bp.route('/run', methods=['GET', 'POST'])
-def run():
-    next = get_redirect_target()
-    print('hit report.report')
-    report_range = request.form.get('report_range')
-    print(report_range, request.form)
-    if request.method == 'POST' and report_range:
-        print('report range run', report_range)
-        start, end = parse_date_range(report_range)
-        if start == end:
-            query = query_by_date(g.session, CallTable, start)
-            print('got query in single value')
-        else:
-            query = query_by_range(g.session, CallTable, start, end)
-
-            print('got query in multi value')
-        print('got query')
-    else:
-        print('running else')
-        report_range = datetime.today().replace(day=5).date()
-        query = query_by_date(g.session, CallTable, report_range)
-
-    frame = run_report(query, report_range)
-
-    # Paginated data frame
-    panda_frame = PandasPage(
-        # Logic for changing the query
-        frame=frame
-    )
-
     return render_template(
         'report.html',
-        title='Report',
+        title='Data Gallery',
         next=next,
-        table=panda_frame,
-        tablename=panda_frame.frame.name
+        columns=list(CallTable.__table__.columns.keys())
+    )
+
+
+@bp.route('/report/<string:report_type>', methods=['GET', 'POST'])
+@login_required
+def report(report_type=''):
+    next = get_redirect_target()
+    output_headers = [
+        'Client',
+        'I/C Presented',
+        'I/C Live Answered',
+        'I/C Abandoned',
+        'Voice Mails',
+        'Incoming Live Answered (%)',
+        'Incoming Received (%)',
+        'Incoming Abandoned (%)',
+        'Average Incoming Duration',
+        'Average Wait Answered',
+        'Average Wait Lost',
+        'Calls Ans Within 15',
+        'Calls Ans Within 30',
+        'Calls Ans Within 45',
+        'Calls Ans Within 60',
+        'Calls Ans Within 999',
+        'Call Ans + 999',
+        'Longest Waiting Answered',
+        'PCA'
+    ]
+    return render_template(
+        'report.html',
+        title='{type} Report'.format(type=report_type.upper()),
+        next=next,
+        columns=list(output_headers)
     )
 
 
@@ -133,24 +69,45 @@ def export():
     return excel.make_response_from_array([[1, 2], [3, 4]], "csv")
 
 
-@bp.route('/ajax', methods=['GET'])
-@bp.route('/ajax/<int:page>', methods=['GET'])
-def ajax(page=1):
-    print('report ajax')
-    report_range = request.args.get('report_range', '', type=str)
-    start, end = parse_date_range(report_range)
-    query = query_by_range(g.session, CallTable, start, end)
+@bp.route('/data', methods=['GET'])
+def data():
+    print('data ajax')
+    g.parser.add_argument('start', type=int, location='args')
+    g.parser.add_argument('draw', type=int, location='args')
+    g.parser.add_argument('length', type=int, location='args')
+    g.parser.add_argument('type', type=str, location='args')
+    g.parser.add_argument('report_range', type=str, location='args')
+    args = g.parser.parse_args()
+    print(dumps(args))
 
-    # This will include relationships
-    # call_schema = CallSchema()
-    # schema_results = call_schema.dump(query, many=True).data
+    query = get_query(
+        g.session,
+        {
+            CallTable.__tablename__: CallTable,
+            EventTable.__tablename__: EventTable
+        },
+        args['report_range']
+    )
+    print(query)
+
+    if args['type'] == 'report':
+        print('running report', flush=True)
+        frame = run_report(query, CallTable)
+        total = len(frame.index)
+        frame.name = '{type} Report: {range}'.format(type=args['type'], range=args['report_range'])
+        print('finished report', flush=True)
+    else:
+        query, total = configure_query(query, CallTable, args)
+        print(query)
+        print(total)
+        frame = query.frame()
 
     # This just runs the query and is much faster
-    results = query.frame().to_dict(orient='records')
+    results = frame.to_dict(orient='split')
 
-    # # Paginated data frame
-    # panda_frame = PandasPage(
-    #     # Logic for changing the query
-    #     **meta_frame(page, query, CallTable)
-    # )
-    return jsonify(results)
+    return jsonify(
+        draw=args['draw'],
+        recordsTotal=total,
+        recordsFiltered=args['length'],
+        data=results['data']
+    )

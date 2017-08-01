@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import generic_repr
 from app.database import Base
+from datetime import timedelta
 
 
 @generic_repr
@@ -50,6 +51,28 @@ class CallTable(Base):
     @staticmethod
     def tracked(event, events):
         return event in events
+
+    def cache(self):
+        """Returns the item and accumulated events
+        (CallTable object, Dictionary of accumulated timedelta events: "events" relationship)
+        """
+        accumulator = {}
+        for event in self.events:
+            # Check if the event type is in the accumulator
+            accumulated_events = accumulator.get(
+                event.event_type,
+                timedelta(0)
+            )
+            accumulated_events += event.end_time - event.start_time
+            accumulator[event.event_type] = accumulated_events
+        # Add each calls accumulated events to the call
+        return self, accumulator
+
+    @staticmethod
+    def chunks(l, n):
+        """Yield successive n-sized chunks from l."""
+        for i in range(0, len(l), n):
+            yield l[i:i + n]
 
 
 @generic_repr

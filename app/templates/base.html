@@ -13,6 +13,9 @@
     <meta name="description" content="{% block head_description %}{% endblock %}">
     <meta name="author" content="{% block head_author %}{% endblock %}">
 
+    <link rel="shortcut icon"
+        href="{{ url_for('static', filename='img/favicon.ico') }}">
+
     <!-- Styles
     ================================================== -->
 
@@ -22,8 +25,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static', filename='style.css') }}">
-
-    <link rel="shortcut icon" href="{{ url_for('favicon') }}" type="image/x-icon" />
 
     <!-- Allows page specific CSS -->
     {% block extracss %}{% endblock %}

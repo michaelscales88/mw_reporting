@@ -1,0 +1,29 @@
+<!-- Modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#frameModal">
+    Query Settings
+</button>
+<div class="modal fade" id="frameModal" tabindex="-1" role="dialog" aria-labelledby="frameModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="frameModalLabel">Query Properties</h5>
+                <p>Current query information...</p>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <input id="report_range" type="text" title="Select report dates..." name="report_range"
+                           class="form-control" style="cursor: pointer;">
+                    <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar fa fa-calendar" aria-hidden="true">&nbsp;</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="save_selection">Save</button>
+                <button type="button" class="btn btn-primary" id="change_range">Update</button>
+                <button type="button" class="btn btn-primary" id="run_range">Run</button>
+            </div>
+        </div>
+    </div>
+</div>

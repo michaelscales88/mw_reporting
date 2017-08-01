@@ -32,6 +32,8 @@ class Config(object):
     # administrator list
     ADMINS = ['your-gmail-username@gmail.com']
 
+    THREAD_LIMIT = 8
+
 
 class ProductionConfig(Config):
     pass

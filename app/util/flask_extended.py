@@ -1,6 +1,6 @@
 # app/lib/flask_extended
 # Credit: https://gist.github.com/mattupstate/2046115
-# minor modifications to accomodate python 3
+# minor modifications to accommodate python 3
 
 import os
 import yaml
