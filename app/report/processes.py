@@ -10,6 +10,23 @@ def results_to_dict(ptr):
     return [dict(zip(col_names, row)) for row in ptr]   # Column: Cell pairs
 
 
+def events_cache(records):
+    new_records = []
+    for record in records:
+        new_group = {}
+        for event in record.events:
+            # Check if the event type is in the accumulator
+            accumulated_events = new_group.get(
+                event.event_type,
+                timedelta(0)
+            )
+            accumulated_events += event.end_time - event.start_time
+            new_group[event.event_type] = accumulated_events
+        # print(new_group)
+        new_records.append((record, new_group))
+    return new_records
+
+
 def get_records(call_model, event_model, get_date):
     print('entering get_records')
     if call_model and event_model:
@@ -50,6 +67,200 @@ def get_records(call_model, event_model, get_date):
 
 def chop_microseconds(delta):
     return delta - timedelta(microseconds=delta.microseconds)
+
+
+def async_worker(record_ids, table, session):
+    printed = False
+    for record_id in record_ids:
+        record = session.query(table).get(record_id)
+        if not printed:
+            print(record.events)
+            printed = True
+        yield record
+
+
+def make_pyexcel_table(headers, row_names, default_row, with_summary=False):
+
+    report_construct = Sheet(
+        colnames=headers
+    )
+
+    row_names = list(row_names)
+
+    if with_summary:
+        row_names += ['Summary']
+
+    for row_name in row_names:
+        additional_row = OrderedDict()
+
+        # Set default values for each row
+        additional_row[str(row_name)] = default_row
+        report_construct.extend_rows(additional_row)
+
+    return report_construct
+
+
+def run_filters(records):
+    print('my records', flush=True)
+    print(records[0], records[-1], flush=True)
+    for x in range(0, len(records)):
+        match_record = records[x]
+        matches = match(records[x + 1:], match_val=match_record)
+        if (
+                len(matches) > 1
+                and (match_record[0].end_time - match_record[0].start_time > timedelta(seconds=20))
+                and match_record[1].get(10, timedelta(0)) == timedelta(0)
+        ):
+            print(matches)
+            # TODO this is the spot that is inefficient
+            # for a_match in matches:
+            #     print(a_match)
+                # for i, o in enumerate(records):
+                #     if o[0].call_id == a_match:
+                #         print('removing record id for', records[i])
+                #         del records[i]
+                #         break
+    return records
+
+
+def format_table(v):
+    return str(v)
+
+
+def process_report(in_process_report, records):
+    for call, events in records:
+
+        # Dialed party number is the client
+        row_name = str(call.dialed_party_number)
+
+        if row_name in in_process_report.rownames and time(hour=7) <= call.start_time.time() <= time(hour=19):
+            call_duration = call.end_time - call.start_time
+            talking_time = events.get(4, timedelta(0))
+            voicemail_time = events.get(10, timedelta(0))
+            hold_time = sum(
+                [events.get(event_type, timedelta(0)) for event_type in (5, 6, 7)],
+                timedelta(0)
+            )
+            wait_duration = call_duration - talking_time - hold_time
+
+            # A live-answered call has > 0 seconds of agent talking time
+            if talking_time > timedelta(0):
+                in_process_report[row_name, 'I/C Presented'] += 1
+                in_process_report[row_name, 'I/C Live Answered'] += 1
+                in_process_report[row_name, 'Average Incoming Duration'] += talking_time
+                in_process_report[row_name, 'Average Wait Answered'] += wait_duration
+
+                # Qualify calls by duration
+                if wait_duration <= timedelta(seconds=15):
+                    in_process_report[row_name, 'Calls Ans Within 15'] += 1
+
+                elif wait_duration <= timedelta(seconds=30):
+                    in_process_report[row_name, 'Calls Ans Within 30'] += 1
+
+                elif wait_duration <= timedelta(seconds=45):
+                    in_process_report[row_name, 'Calls Ans Within 45'] += 1
+
+                elif wait_duration <= timedelta(seconds=60):
+                    in_process_report[row_name, 'Calls Ans Within 60'] += 1
+
+                elif wait_duration <= timedelta(seconds=999):
+                    in_process_report[row_name, 'Calls Ans Within 999'] += 1
+
+                else:
+                    in_process_report[row_name, 'Call Ans + 999'] += 1
+
+                if wait_duration > in_process_report[row_name, 'Longest Waiting Answered']:
+                    in_process_report[row_name, 'Longest Waiting Answered'] = wait_duration
+
+            # A voice mail is not live answered and last longer than 20 seconds
+            elif voicemail_time > timedelta(seconds=20):
+                in_process_report[row_name, 'I/C Presented'] += 1
+                in_process_report[row_name, 'Voice Mails'] += 1
+                in_process_report[row_name, 'Average Wait Lost'] += call_duration
+
+            # An abandoned call is not live answered and last longer than 20 seconds
+            elif call_duration > timedelta(seconds=20):
+                in_process_report[row_name, 'I/C Presented'] += 1
+                in_process_report[row_name, 'I/C Abandoned'] += 1
+                in_process_report[row_name, 'Average Wait Lost'] += call_duration
+
+    db_session.remove()
+    return in_process_report
+
+
+def make_printable_table(raw_format_table):
+    raw_format_table.map(format_table)
+    return raw_format_table
+    # for row_name in test_output.rownames:
+    #     row_name = str(row_name)
+    #     try:
+    #         test_output[row_name, 'Incoming Live Answered (%)'] = '{0:.1%}'.format(
+    #             test_output[row_name, 'I/C Live Answered'] / test_output[row_name, 'I/C Presented']
+    #         )
+    #     except ZeroDivisionError:
+    #         test_output[row_name, 'Incoming Live Answered (%)'] = '{0:.1%}'.format(1.0)
+    #
+    #     try:
+    #         test_output[row_name, 'Incoming Live Answered (%)'] = '{0:.1%}'.format(
+    #             test_output[row_name, 'I/C Live Answered'] / test_output[row_name, 'I/C Presented']
+    #         )
+    #     except ZeroDivisionError:
+    #         test_output[row_name, 'Incoming Live Answered (%)'] = '{0:.1%}'.format(1.0)
+    #
+    #     try:
+    #         test_output[row_name, 'Incoming Received (%)'] = '{0:.1%}'.format(
+    #             (test_output[row_name, 'I/C Live Answered'] + test_output[row_name, 'Voice Mails'])
+    #             / test_output[row_name, 'I/C Presented']
+    #         )
+    #     except ZeroDivisionError:
+    #         test_output[row_name, 'Incoming Received (%)'] = '{0:.1%}'.format(1.0)
+    #
+    #     try:
+    #         test_output[row_name, 'Incoming Abandoned (%)'] = '{0:.1%}'.format(
+    #             test_output[row_name, 'I/C Abandoned'] / test_output[row_name, 'I/C Presented']
+    #         )
+    #     except ZeroDivisionError:
+    #         test_output[row_name, 'Incoming Abandoned (%)'] = '{0:.1%}'.format(1.0)
+    #
+    #     try:
+    #         test_output[row_name, 'Average Incoming Duration'] = str(
+    #             chop_microseconds(
+    #                 test_output[row_name, 'Average Incoming Duration'] / test_output[row_name, 'I/C Live Answered'])
+    #         )
+    #     except ZeroDivisionError:
+    #         test_output[row_name, 'Average Incoming Duration'] = '0:00:00'
+    #     except TypeError:
+    #         print(row_name, test_output[row_name, 'Average Incoming Duration'],
+    #               test_output[row_name, 'I/C Live Answered'])
+    #         raise
+    #
+    #     # print(test_output[row_name, 'Average Wait Answered'])
+    #     try:
+    #         test_output[row_name, 'Average Wait Answered'] = str(
+    #             chop_microseconds(
+    #                 test_output[row_name, 'Average Wait Answered'] / test_output[row_name, 'I/C Live Answered'])
+    #         )
+    #     except ZeroDivisionError:
+    #         test_output[row_name, 'Average Wait Answered'] = '0:00:00'
+    #
+    #     try:
+    #         test_output[row_name, 'Average Wait Lost'] = str(
+    #             chop_microseconds(test_output[row_name, 'Average Wait Lost'] / test_output[row_name, 'I/C Abandoned'])
+    #         )
+    #     except ZeroDivisionError:
+    #         test_output[row_name, 'Average Wait Lost'] = '0:00:00'
+    #
+    #     test_output[row_name, 'Longest Waiting Answered'] = str(
+    #         chop_microseconds(test_output[row_name, 'Longest Waiting Answered'])
+    #     )
+    #
+    #     try:
+    #         test_output[row_name, 'PCA'] = '{0:.1%}'.format(
+    #             (test_output[row_name, 'Calls Ans Within 15'] + test_output[row_name, 'Calls Ans Within 30'])
+    #             / test_output[row_name, 'I/C Presented']
+    #         )
+    #     except ZeroDivisionError:
+    #         test_output[row_name, 'PCA'] = '{0:.1%}'.format(1.0)
 
 
 def match(record_list, match_val=None):
@@ -114,42 +325,36 @@ def sla_report(records, call_table, client_list=None):
     )
     row_names = list(client_list)
     # row_names += ['Summary']
-    try:
-        for row_name in row_names:
-            additional_row = OrderedDict()
+    for row_name in row_names:
+        additional_row = OrderedDict()
 
-            # Set default values for each row
-            additional_row[str(row_name)] = [
-                0,  # 'I/C Presented'
-                0,  # 'I/C Live Answered'
-                0,  # 'I/C Abandoned'
-                0,  # 'Voice Mails'
-                0,  # 'Incoming Live Answered (%)',
-                0,  # 'Incoming Received (%)',
-                0,  # 'Incoming Abandoned (%)'
-                timedelta(0),   # 'Average Incoming Duration'
-                timedelta(0),   # 'Average Wait Answered'
-                timedelta(0),   # 'Average Wait Lost'
-                0,  # 'Calls Ans Within 15'
-                0,  # 'Calls Ans Within 30'
-                0,  # 'Calls Ans Within 45'
-                0,  # 'Calls Ans Within 60'
-                0,  # 'Calls Ans Within 999'
-                0,  # 'Call Ans + 999'
-                timedelta(0),   # 'Longest Waiting Answered'
-                0   # 'PCA'
-            ]
-            test_output.extend_rows(additional_row)
-    except KeyError:
-        from json import dumps
-        print(dumps(client_list, indent=4))
-        raise
+        # Set default values for each row
+        additional_row[str(row_name)] = [
+            0,  # 'I/C Presented'
+            0,  # 'I/C Live Answered'
+            0,  # 'I/C Abandoned'
+            0,  # 'Voice Mails'
+            0,  # 'Incoming Live Answered (%)',
+            0,  # 'Incoming Received (%)',
+            0,  # 'Incoming Abandoned (%)'
+            timedelta(0),  # 'Average Incoming Duration'
+            timedelta(0),  # 'Average Wait Answered'
+            timedelta(0),  # 'Average Wait Lost'
+            0,  # 'Calls Ans Within 15'
+            0,  # 'Calls Ans Within 30'
+            0,  # 'Calls Ans Within 45'
+            0,  # 'Calls Ans Within 60'
+            0,  # 'Calls Ans Within 999'
+            0,  # 'Call Ans + 999'
+            timedelta(0),  # 'Longest Waiting Answered'
+            0  # 'PCA'
+        ]
+        test_output.extend_rows(additional_row)
 
-    # print(test_output.rownames)
     # Filter Step
-    print('start sla_report', datetime.now())
+    print('start filter', datetime.now(), flush=True)
     # Convert record ids into actual records /w cached events
-    records = [call_table.cache(call_table.query.get(record_id)) for record_id in records]
+    # records = [call_table.cache(call_table.query.get(record_id)) for record_id in records]
     try:
         for x in range(0, len(records)):
             match_record = records[x]
@@ -170,6 +375,9 @@ def sla_report(records, call_table, client_list=None):
         # x has moved past the end of the list of remaining records
         pass
     # print(len(records), records[0])
+    print('stop filter', datetime.now(), flush=True)
+
+    print('start process', datetime.now(), flush=True)
     # Process Step
     for call, events in records:
         # print(call)
@@ -254,7 +462,9 @@ def sla_report(records, call_table, client_list=None):
             else:
                 # print('passed', call)
                 pass
-    print('stop sla_report', datetime.now())
+    print('stop process', datetime.now(), flush=True)
+
+    print('start finalize', datetime.now(), flush=True)
 
     # Finalize step
     for row_name in test_output.rownames:
@@ -324,4 +534,5 @@ def sla_report(records, call_table, client_list=None):
             )
         except ZeroDivisionError:
             test_output[row_name, 'PCA'] = '{0:.1%}'.format(1.0)
+    print('stop finalize', datetime.now(), flush=True)
     return test_output

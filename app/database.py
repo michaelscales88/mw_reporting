@@ -6,12 +6,12 @@ from redpanda.orm import sessionmaker
 from app import app
 
 # Internal db
-engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+db_engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
-                                         bind=engine))
+                                         bind=db_engine))
 
-# Internal db
+# Source db
 pg_engine = create_engine(app.config['PG_CONNECTION'])
 pg_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
@@ -34,4 +34,4 @@ def init_db():
     from app.user import User
     from app.report import EventTable, CallTable
 
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=db_engine)

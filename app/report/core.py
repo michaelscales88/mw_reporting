@@ -4,13 +4,12 @@ from flask import current_app
 from pandas import DataFrame, Series
 from dateutil.parser import parse
 from datetime import timedelta, datetime
-from itertools import repeat
-from .processes import get_records, sla_report
+from .processes import events_cache, make_pyexcel_table, make_printable_table, run_filters, process_report
 from multiprocessing.dummy import Pool as ThreadPool
 
 
 def query_by_range(session, call_table, start, end):
-    return session.query(call_table.call_id).filter(
+    return session.query(call_table).filter(
         and_(
             call_table.call_direction == 1,
             func.date(call_table.start_time) >= func.date(start),
@@ -65,38 +64,81 @@ def grouper(item):
 
 
 def run_report(query, call_table):
-    thread_count = current_app.config['THREAD_LIMIT']
+
     print('hit run_report', flush=True)
-    # Make the Pool of workers
+    # Convert query to list of models
+    records = query.all()
+
+    # Make a pool of workers
+    thread_count = current_app.config['THREAD_LIMIT']
     pool = ThreadPool(thread_count)
+    record_pivot = int(len(records) / thread_count)
 
-    # All record ids for this report
-    record_ids = [int(query_id[0]) for query_id in query.all()]
+    print('run filters start', datetime.now(), flush=True)
 
-    # Determine number of records per thread
-    record_pivot = int(len(record_ids) / thread_count)
-    print('Records per thread:', record_pivot)
-
-    print('starting report pool', flush=True)
-    finished_report = pool.starmap(
-        sla_report,
-        zip(
-            call_table.chunks(record_ids, record_pivot), repeat(call_table), repeat(list(current_app.config['CLIENTS']))
-        )
+    records = pool.starmap(
+        run_filters,
+        zip(call_table.chunks(events_cache(records), record_pivot))
     )
     # close the pool and wait for the work to finish
     pool.close()
     pool.join()
-    print('finished reports', datetime.now())
-    final_report = finished_report[0]
-    for report in finished_report[1:]:
-        final_report += report
 
-    print(final_report)
-    # Run report on cached records
+    print('run filters stop', datetime.now(), flush=True)
+
+    output_headers = [
+        'I/C Presented',
+        'I/C Live Answered',
+        'I/C Abandoned',
+        'Voice Mails',
+        'Incoming Live Answered (%)',
+        'Incoming Received (%)',
+        'Incoming Abandoned (%)',
+        'Average Incoming Duration',
+        'Average Wait Answered',
+        'Average Wait Lost',
+        'Calls Ans Within 15',
+        'Calls Ans Within 30',
+        'Calls Ans Within 45',
+        'Calls Ans Within 60',
+        'Calls Ans Within 999',
+        'Call Ans + 999',
+        'Longest Waiting Answered',
+        'PCA'
+    ]
+
+    default_row = [
+        0,  # 'I/C Presented'
+        0,  # 'I/C Live Answered'
+        0,  # 'I/C Abandoned'
+        0,  # 'Voice Mails'
+        0,  # 'Incoming Live Answered (%)',
+        0,  # 'Incoming Received (%)',
+        0,  # 'Incoming Abandoned (%)'
+        timedelta(0),  # 'Average Incoming Duration'
+        timedelta(0),  # 'Average Wait Answered'
+        timedelta(0),  # 'Average Wait Lost'
+        0,  # 'Calls Ans Within 15'
+        0,  # 'Calls Ans Within 30'
+        0,  # 'Calls Ans Within 45'
+        0,  # 'Calls Ans Within 60'
+        0,  # 'Calls Ans Within 999'
+        0,  # 'Call Ans + 999'
+        timedelta(0),  # 'Longest Waiting Answered'
+        0  # 'PCA'
+    ]
+
+    current_report = make_pyexcel_table(output_headers, list(current_app.config['CLIENTS']), default_row)
+
+    # Flatten pool results
+    records = [item for sublist in records for item in sublist]
+
+    report = process_report(current_report, records)
+    make_printable_table(report)
+
+    # Convert pyexcel table into dataframe
     df = DataFrame.from_items(
-        [col for col in final_report.to_dict().items()]
-        # []
+        [col for col in report.to_dict().items()]
     )
     index = Series(['{ext} {name}'.format(ext=client_ext, name=client_info['CLIENT_NAME'])
                     for client_ext, client_info in current_app.config['CLIENTS'].items()] + ['Summary'])
@@ -111,27 +153,30 @@ def parse_date_range(date_range):
 
 def get_query(session, models, dates):
     CallTable = models.get('calltable')
-    EventTable = models.get('eventtable')
+    # EventTable = models.get('eventtable')
     start, end = parse_date_range(dates)
 
-    # Make the Pool of workers
-    pool = ThreadPool(4)
-
-    dates = []
+    get_dates = []
     iter_date = start
     # Do a cheap lookup whether we need to get records
     while iter_date <= end:
         found = records_exist(session, CallTable, iter_date)
         if not found:
-            dates += [iter_date.date()]
+            get_dates += [iter_date.date()]
         iter_date += timedelta(days=1)
 
-    if dates:
+    if get_dates:
+        # Make the Pool of workers
+        pool = ThreadPool(current_app.config['THREAD_LIMIT'])
+
+        # Get records from foreign database
         print('found dates', dates)
-        results = pool.starmap(get_records, zip(repeat(CallTable), repeat(EventTable), dates))
+        # results = pool.starmap(get_records, zip(repeat(CallTable), repeat(EventTable), dates))
+
         # close the pool and wait for the work to finish
         pool.close()
         pool.join()
 
     query = query_by_range(session, CallTable, start, end)
+
     return query

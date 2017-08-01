@@ -1,6 +1,7 @@
 from flask import render_template, g, Blueprint, jsonify
 from flask_login import login_required
 from json import dumps
+from datetime import datetime
 
 # App imports
 from app.core import get_redirect_target
@@ -78,8 +79,8 @@ def data():
     g.parser.add_argument('type', type=str, location='args')
     g.parser.add_argument('report_range', type=str, location='args')
     args = g.parser.parse_args()
-    print(dumps(args))
 
+    print('start draw records', datetime.now(), flush=True)
     query = get_query(
         g.session,
         {
@@ -88,7 +89,7 @@ def data():
         },
         args['report_range']
     )
-    print(query)
+    print('stop draw records', datetime.now(), flush=True)
 
     if args['type'] == 'report':
         print('running report', flush=True)
@@ -98,8 +99,6 @@ def data():
         print('finished report', flush=True)
     else:
         query, total = configure_query(query, CallTable, args)
-        print(query)
-        print(total)
         frame = query.frame()
 
     # This just runs the query and is much faster

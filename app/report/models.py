@@ -25,7 +25,7 @@ class CallTable(Base):
     inbound_route = Column(Text)
 
     # parent-child relationship
-    events = relationship("EventTable", back_populates='call')   # Iterable of EventTable objects
+    events = relationship("EventTable", back_populates='call', lazy='joined')   # Iterable of EventTable objects
 
     @declared_attr
     def __tablename__(cls):
@@ -107,6 +107,10 @@ class EventTable(Base):
         return """SELECT * FROM c_event WHERE to_char(c_event.start_time, 'YYYY-MM-DD') = '{date}'""".format(
             date=request_date
         )
+
+    @classmethod
+    def get(cls, item):
+        return
 
 
 @generic_repr

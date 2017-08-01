@@ -2,33 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="445d36eb-96e4-4474-8f6d-c1e4b0d4676e" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/util/__init__.py" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/app/async.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/app/report/pandas_page.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/app/report/schemas.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/app/report/sla_report.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/app/report/templates/data_frames/data_frame.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/app/report/templates/data_frames/frame_links.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/app/report/templates/data_index.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/app/resources.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/sla_test.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test.py" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/app/flask_extended.py" afterPath="$PROJECT_DIR$/app/util/flask_extended.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/app/report/templates/data_frames/frame_modal.html" afterPath="$PROJECT_DIR$/app/report/templates/query_properties.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/app/static/brand.ico" afterPath="$PROJECT_DIR$/app/static/img/brand.ico" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/app/static/favicon.ico" afterPath="$PROJECT_DIR$/app/static/img/favicon.ico" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/__init__.py" afterPath="$PROJECT_DIR$/app/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/default_config.py" afterPath="$PROJECT_DIR$/app/default_config.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/database.py" afterPath="$PROJECT_DIR$/app/database.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/report/core.py" afterPath="$PROJECT_DIR$/app/report/core.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/report/models.py" afterPath="$PROJECT_DIR$/app/report/models.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/report/processes.py" afterPath="$PROJECT_DIR$/app/report/processes.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/report/templates/report.html" afterPath="$PROJECT_DIR$/app/report/templates/report.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/report/views.py" afterPath="$PROJECT_DIR$/app/report/views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/base.html" afterPath="$PROJECT_DIR$/app/templates/base.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/navigation/header.html" afterPath="$PROJECT_DIR$/app/templates/navigation/header.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/templates/navigation/public.html" afterPath="$PROJECT_DIR$/app/templates/navigation/public.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/view.py" afterPath="$PROJECT_DIR$/app/view.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -38,7 +17,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/mWreporting$mWreporting.coverage" NAME="mWreporting Coverage Results" MODIFIED="1501565309259" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/mWreporting$mWreporting.coverage" NAME="mWreporting Coverage Results" MODIFIED="1501624470833" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
@@ -46,34 +25,21 @@
       <file leaf-file-name="report.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/report/templates/report.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1995">
+            <state relative-caret-position="539">
               <caret line="133" column="37" lean-forward="false" selection-start-line="133" selection-start-column="37" selection-end-line="133" selection-end-column="37" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/report/views.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="213">
-              <caret line="94" column="43" lean-forward="false" selection-start-line="94" selection-start-column="43" selection-end-line="94" selection-end-column="43" />
-              <folding>
-                <element signature="e#0#56#0" expanded="true" />
-                <element signature="e#897#1460#0" expanded="false" />
-                <marker date="1501555912000" expanded="true" signature="2899:2942" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="core.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="core.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/report/core.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-106">
-              <caret line="77" column="45" lean-forward="false" selection-start-line="77" selection-start-column="45" selection-end-line="77" selection-end-column="45" />
+            <state relative-caret-position="-1061">
+              <caret line="5" column="40" lean-forward="false" selection-start-line="5" selection-start-column="40" selection-end-line="5" selection-end-column="40" />
               <folding>
-                <element signature="e#0#41#0" expanded="true" />
+                <element signature="e#2566#3111#0" expanded="false" />
+                <element signature="e#3131#3812#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -82,7 +48,7 @@
       <file leaf-file-name="default_config.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/default_config.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
+            <state relative-caret-position="510">
               <caret line="34" column="20" lean-forward="false" selection-start-line="34" selection-start-column="20" selection-end-line="34" selection-end-column="20" />
               <folding />
             </state>
@@ -92,22 +58,42 @@
       <file leaf-file-name="database.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/database.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="15" column="10" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="10" />
+            <state relative-caret-position="405">
+              <caret line="32" column="0" lean-forward="true" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="processes.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="processes.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/report/processes.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1029">
-              <caret line="143" column="30" lean-forward="true" selection-start-line="143" selection-start-column="30" selection-end-line="143" selection-end-column="30" />
+            <state relative-caret-position="45">
+              <caret line="3" column="35" lean-forward="false" selection-start-line="3" selection-start-column="35" selection-end-line="3" selection-end-column="35" />
               <folding>
-                <element signature="e#0#41#0" expanded="true" />
-                <element signature="e#3045#3590#0" expanded="false" />
-                <element signature="e#3898#4736#0" expanded="false" />
+                <element signature="e#974#2347#0" expanded="false" />
+                <element signature="e#2785#3177#0" expanded="false" />
+                <element signature="e#4099#4112#0" expanded="false" />
+                <element signature="e#7052#10501#0" expanded="false" />
+                <element signature="e#7119#7158#0" expanded="false" />
+                <element signature="e#10548#11574#0" expanded="false" />
+                <element signature="e#11636#22069#0" expanded="false" />
+                <element signature="e#11653#12198#0" expanded="false" />
+                <element signature="e#12367#13286#0" expanded="false" />
+                <element signature="e#14234#14306#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/report/models.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="461">
+              <caret line="66" column="62" lean-forward="true" selection-start-line="59" selection-start-column="8" selection-end-line="66" selection-end-column="62" />
+              <folding>
+                <marker date="1501617116000" expanded="true" signature="1092:1170" ph="SELECT * FRO... c_call" />
+                <marker date="1501617116000" expanded="true" signature="3308:3388" ph="SELECT * FRO... c_event" />
               </folding>
             </state>
           </provider>
@@ -140,6 +126,11 @@
       <find>table</find>
       <find>summary</find>
       <find>get_rec</find>
+      <find>group</find>
+      <find>grouper</find>
+      <find>sla</find>
+      <find>sl</find>
+      <find>sub</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -175,7 +166,6 @@
         <option value="$PROJECT_DIR$/sla_test.py" />
         <option value="$PROJECT_DIR$/instance/new_clients.yml" />
         <option value="$PROJECT_DIR$/instance/clients.yml" />
-        <option value="$PROJECT_DIR$/app/database.py" />
         <option value="$PROJECT_DIR$/app/core.py" />
         <option value="$PROJECT_DIR$/instance/secret_stuff.py" />
         <option value="$PROJECT_DIR$/instance/secret_stuff.yml" />
@@ -203,10 +193,11 @@
         <option value="$PROJECT_DIR$/app/view.py" />
         <option value="$PROJECT_DIR$/app/report/templates/report.html" />
         <option value="$PROJECT_DIR$/app/report/sla_report.py" />
-        <option value="$PROJECT_DIR$/app/report/views.py" />
-        <option value="$PROJECT_DIR$/app/report/models.py" />
-        <option value="$PROJECT_DIR$/app/report/processes.py" />
         <option value="$PROJECT_DIR$/app/default_config.py" />
+        <option value="$PROJECT_DIR$/app/report/models.py" />
+        <option value="$PROJECT_DIR$/app/report/views.py" />
+        <option value="$PROJECT_DIR$/app/report/processes.py" />
+        <option value="$PROJECT_DIR$/app/database.py" />
         <option value="$PROJECT_DIR$/app/report/core.py" />
       </list>
     </option>
@@ -237,8 +228,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="Scratches" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -531,11 +522,10 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1280" height="800" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.50730413" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.50730413" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32934928" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32934928" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -561,9 +551,9 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.50730413" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32934928" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.61354584" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32934928" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25625" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
@@ -572,8 +562,8 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32934928" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
     </layout-to-restore>
   </component>
@@ -585,7 +575,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="3" />
+      <option name="time" value="4" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -678,9 +668,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="156">
           <caret line="86" column="0" lean-forward="true" selection-start-line="86" selection-start-column="0" selection-end-line="86" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#73#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -802,14 +789,6 @@
     <entry file="file://$PROJECT_DIR$/app/util/async.py" />
     <entry file="file://$PROJECT_DIR$/app/util/assets.py" />
     <entry file="file://$PROJECT_DIR$/app/report/schemas.py" />
-    <entry file="file://$PROJECT_DIR$/app/report/templates/report.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1995">
-          <caret line="133" column="37" lean-forward="false" selection-start-line="133" selection-start-column="37" selection-end-line="133" selection-end-column="37" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/report/pandas_page.py" />
     <entry file="file://$PROJECT_DIR$/app/report/sla_report.py" />
     <entry file="file:///Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/multiprocessing/pool.py">
@@ -824,7 +803,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="23580">
           <caret line="1597" column="0" lean-forward="false" selection-start-line="1597" selection-start-column="0" selection-end-line="1597" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -832,68 +810,82 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="115">
           <caret line="5340" column="8" lean-forward="false" selection-start-line="5340" selection-start-column="8" selection-end-line="5340" selection-end-column="8" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/report/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1095">
-          <caret line="73" column="0" lean-forward="false" selection-start-line="73" selection-start-column="0" selection-end-line="73" selection-end-column="0" />
+        <state relative-caret-position="461">
+          <caret line="66" column="62" lean-forward="true" selection-start-line="59" selection-start-column="8" selection-end-line="66" selection-end-column="62" />
           <folding>
-            <element signature="e#0#75#0" expanded="true" />
-            <marker date="1501563291000" expanded="true" signature="1077:1155" ph="SELECT * FRO... c_call" />
-            <marker date="1501563291000" expanded="true" signature="3293:3373" ph="SELECT * FRO... c_event" />
+            <marker date="1501617116000" expanded="true" signature="1092:1170" ph="SELECT * FRO... c_call" />
+            <marker date="1501617116000" expanded="true" signature="3308:3388" ph="SELECT * FRO... c_event" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/report/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="741">
+          <caret line="100" column="62" lean-forward="false" selection-start-line="100" selection-start-column="62" selection-end-line="100" selection-end-column="62" />
+          <folding>
+            <element signature="e#0#56#0" expanded="true" />
+            <element signature="e#927#1490#0" expanded="false" />
+            <marker date="1501624439000" expanded="true" signature="2966:3009" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/report/templates/report.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="539">
+          <caret line="133" column="37" lean-forward="false" selection-start-line="133" selection-start-column="37" selection-end-line="133" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/report/processes.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="35" lean-forward="false" selection-start-line="3" selection-start-column="35" selection-end-line="3" selection-end-column="35" />
+          <folding>
+            <element signature="e#974#2347#0" expanded="false" />
+            <element signature="e#2785#3177#0" expanded="false" />
+            <element signature="e#4099#4112#0" expanded="false" />
+            <element signature="e#7052#10501#0" expanded="false" />
+            <element signature="e#7119#7158#0" expanded="false" />
+            <element signature="e#10548#11574#0" expanded="false" />
+            <element signature="e#11636#22069#0" expanded="false" />
+            <element signature="e#11653#12198#0" expanded="false" />
+            <element signature="e#12367#13286#0" expanded="false" />
+            <element signature="e#14234#14306#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/database.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="15" column="10" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="10" />
+        <state relative-caret-position="405">
+          <caret line="32" column="0" lean-forward="true" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/default_config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="34" column="20" lean-forward="false" selection-start-line="34" selection-start-column="20" selection-end-line="34" selection-end-column="20" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/report/core.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-106">
-          <caret line="77" column="45" lean-forward="false" selection-start-line="77" selection-start-column="45" selection-end-line="77" selection-end-column="45" />
+        <state relative-caret-position="-1061">
+          <caret line="5" column="40" lean-forward="false" selection-start-line="5" selection-start-column="40" selection-end-line="5" selection-end-column="40" />
           <folding>
-            <element signature="e#0#41#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/default_config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="34" column="20" lean-forward="false" selection-start-line="34" selection-start-column="20" selection-end-line="34" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/report/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="213">
-          <caret line="94" column="43" lean-forward="false" selection-start-line="94" selection-start-column="43" selection-end-line="94" selection-end-column="43" />
-          <folding>
-            <element signature="e#0#56#0" expanded="true" />
-            <element signature="e#897#1460#0" expanded="false" />
-            <marker date="1501555912000" expanded="true" signature="2899:2942" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/report/processes.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1029">
-          <caret line="143" column="30" lean-forward="true" selection-start-line="143" selection-start-column="30" selection-end-line="143" selection-end-column="30" />
-          <folding>
-            <element signature="e#0#41#0" expanded="true" />
-            <element signature="e#3045#3590#0" expanded="false" />
-            <element signature="e#3898#4736#0" expanded="false" />
+            <element signature="e#2566#3111#0" expanded="false" />
+            <element signature="e#3131#3812#0" expanded="false" />
           </folding>
         </state>
       </provider>
