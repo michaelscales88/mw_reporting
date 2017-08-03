@@ -2,6 +2,7 @@ from flask import render_template, g, Blueprint, jsonify
 from flask_login import login_required
 from json import dumps
 from datetime import datetime
+from collections import defaultdict
 
 # App imports
 from app.core import get_redirect_target
@@ -9,7 +10,7 @@ from app.core import get_redirect_target
 # Module imports
 from . import excel
 from .models import CallTable, EventTable
-from .core import configure_query, run_report, get_query
+from .core import configure_query, run_report, get_query, parse_date_range
 
 bp = Blueprint(
     'report',
@@ -71,8 +72,10 @@ def export():
 
 
 @bp.route('/data', methods=['GET'])
-def data():
+def data(page=1):
     print('data ajax')
+
+    # Parser section
     g.parser.add_argument('start', type=int, location='args')
     g.parser.add_argument('draw', type=int, location='args')
     g.parser.add_argument('length', type=int, location='args')
@@ -80,24 +83,24 @@ def data():
     g.parser.add_argument('report_range', type=str, location='args')
     args = g.parser.parse_args()
 
+    # Arguments
+    start, end = parse_date_range(args['report_range'])
+
+    # Execute query
+    print(start, end)
     print('start draw records', datetime.now(), flush=True)
-    query = get_query(
-        g.session,
-        {
-            CallTable.__tablename__: CallTable,
-            EventTable.__tablename__: EventTable
-        },
-        args['report_range']
-    )
+    query = g.session.query(CallTable, EventTable).join(EventTable).filter(
+        CallTable.start_time >= start).filter(CallTable.end_time <= end).filter(CallTable.call_direction == 1)
     print('stop draw records', datetime.now(), flush=True)
 
     if args['type'] == 'report':
         print('running report', flush=True)
-        frame = run_report(query, CallTable)
+        frame = run_report(query)
         total = len(frame.index)
         frame.name = '{type} Report: {range}'.format(type=args['type'], range=args['report_range'])
         print('finished report', flush=True)
     else:
+        # Server-side processing properties
         query, total = configure_query(query, CallTable, args)
         frame = query.frame()
 

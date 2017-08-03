@@ -4,7 +4,9 @@ from flask import current_app
 from pandas import DataFrame, Series
 from dateutil.parser import parse
 from datetime import timedelta, datetime
-from .processes import events_cache, make_pyexcel_table, make_printable_table, run_filters, process_report
+from collections import OrderedDict
+from itertools import repeat
+from .processes import chunks, make_programmatic_column, make_pyexcel_table, make_printable_table, run_filters, process_report
 from multiprocessing.dummy import Pool as ThreadPool
 
 
@@ -34,9 +36,9 @@ def get_count(query):
 def configure_query(
         query,  # Unmodified query object
         model,  # Model used in Query
-        query_params
+        query_params,
+        ascending=False
 ):
-    ascending = True
     # Determine metadata and create mapper class
     query_model = inspect(model)
 
@@ -63,11 +65,18 @@ def grouper(item):
     return item.start_time.month, item.start_time.day
 
 
-def run_report(query, call_table):
-
+def run_report(query):
     print('hit run_report', flush=True)
-    # Convert query to list of models
-    records = query.all()
+
+    # Mini-fy the join statement. Only care about event_type: time-interval amount
+    records = OrderedDict()
+    for call_record, event_record in query.all():
+        events = records.get(call_record, {})
+        try:
+            events[event_record.event_type] += event_record.end_time - event_record.start_time
+        except KeyError:
+            events[event_record.event_type] = event_record.end_time - event_record.start_time
+        records[call_record] = events
 
     # Make a pool of workers
     thread_count = current_app.config['THREAD_LIMIT']
@@ -76,15 +85,25 @@ def run_report(query, call_table):
 
     print('run filters start', datetime.now(), flush=True)
 
-    records = pool.starmap(
+    thread_results = pool.starmap(
         run_filters,
-        zip(call_table.chunks(events_cache(records), record_pivot))
+        zip(
+            # OrderedDict -> List: Maintains order of original query
+            chunks(list(records.items()), chunk_size=record_pivot)
+        )
     )
+
     # close the pool and wait for the work to finish
     pool.close()
     pool.join()
 
     print('run filters stop', datetime.now(), flush=True)
+
+    # This is probably inefficient
+    # Flattens result lists from threads into one list
+    filtered_records = []
+    for thread_list in thread_results:
+        filtered_records.extend(thread_list)
 
     output_headers = [
         'I/C Presented',
@@ -112,9 +131,9 @@ def run_report(query, call_table):
         0,  # 'I/C Live Answered'
         0,  # 'I/C Abandoned'
         0,  # 'Voice Mails'
-        0,  # 'Incoming Live Answered (%)',
-        0,  # 'Incoming Received (%)',
-        0,  # 'Incoming Abandoned (%)'
+        1.0,  # 'Incoming Live Answered (%)',
+        1.0,  # 'Incoming Received (%)',
+        0.0,  # 'Incoming Abandoned (%)'
         timedelta(0),  # 'Average Incoming Duration'
         timedelta(0),  # 'Average Wait Answered'
         timedelta(0),  # 'Average Wait Lost'
@@ -125,20 +144,69 @@ def run_report(query, call_table):
         0,  # 'Calls Ans Within 999'
         0,  # 'Call Ans + 999'
         timedelta(0),  # 'Longest Waiting Answered'
-        0  # 'PCA'
+        1.0  # 'PCA'
+    ]
+
+    row_data = [
+        {
+            'tgt_column': 'Incoming Live Answered (%)',
+            'lh_values': ('I/C Live Answered',),
+            'rh_values': ('I/C Presented',)
+
+        },
+        {
+            'tgt_column': 'Incoming Received (%)',
+            'lh_values': ('I/C Live Answered', 'Voice Mails',),
+            'rh_values': ('I/C Presented',)
+
+        },
+        {
+            'tgt_column': 'Incoming Abandoned (%)',
+            'lh_values': ('I/C Abandoned',),
+            'rh_values': ('I/C Presented',)
+
+        },
+        {
+            'tgt_column': 'Average Incoming Duration',
+            'lh_values': ('Average Incoming Duration',),
+            'rh_values': ('I/C Live Answered',)
+
+        },
+        {
+            'tgt_column': 'Average Wait Answered',
+            'lh_values': ('Average Wait Answered',),
+            'rh_values': ('I/C Live Answered',)
+
+        },
+        {
+            'tgt_column': 'Average Wait Lost',
+            'lh_values': ('Average Wait Lost',),
+            'rh_values': ('I/C Abandoned',)
+
+        },
+        {
+            'tgt_column': 'PCA',
+            'lh_values': ('Calls Ans Within 15', 'Calls Ans Within 30',),
+            'rh_values': ('I/C Presented',)
+        }
     ]
 
     current_report = make_pyexcel_table(output_headers, list(current_app.config['CLIENTS']), default_row)
 
-    # Flatten pool results
-    records = [item for sublist in records for item in sublist]
+    # Consume query data
+    report = process_report(current_report, filtered_records)
 
-    report = process_report(current_report, records)
-    make_printable_table(report)
+    completed_report = None
+
+    for rd in row_data:
+        completed_report = make_programmatic_column(report, **rd)
+
+    # Stringify each cell
+    make_printable_table(completed_report)
 
     # Convert pyexcel table into dataframe
     df = DataFrame.from_items(
-        [col for col in report.to_dict().items()]
+        [col for col in completed_report.to_dict().items()]
     )
     index = Series(['{ext} {name}'.format(ext=client_ext, name=client_info['CLIENT_NAME'])
                     for client_ext, client_info in current_app.config['CLIENTS'].items()] + ['Summary'])
@@ -153,7 +221,7 @@ def parse_date_range(date_range):
 
 def get_query(session, models, dates):
     CallTable = models.get('calltable')
-    # EventTable = models.get('eventtable')
+    EventTable = models.get('eventtable')
     start, end = parse_date_range(dates)
 
     get_dates = []

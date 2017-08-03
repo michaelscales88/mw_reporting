@@ -52,27 +52,8 @@ class CallTable(Base):
     def tracked(event, events):
         return event in events
 
-    def cache(self):
-        """Returns the item and accumulated events
-        (CallTable object, Dictionary of accumulated timedelta events: "events" relationship)
-        """
-        accumulator = {}
-        for event in self.events:
-            # Check if the event type is in the accumulator
-            accumulated_events = accumulator.get(
-                event.event_type,
-                timedelta(0)
-            )
-            accumulated_events += event.end_time - event.start_time
-            accumulator[event.event_type] = accumulated_events
-        # Add each calls accumulated events to the call
-        return self, accumulator
-
-    @staticmethod
-    def chunks(l, n):
-        """Yield successive n-sized chunks from l."""
-        for i in range(0, len(l), n):
-            yield l[i:i + n]
+    def __lt__(self, other):
+        return self.call_id < other.call_id
 
 
 @generic_repr
@@ -107,10 +88,6 @@ class EventTable(Base):
         return """SELECT * FROM c_event WHERE to_char(c_event.start_time, 'YYYY-MM-DD') = '{date}'""".format(
             date=request_date
         )
-
-    @classmethod
-    def get(cls, item):
-        return
 
 
 @generic_repr

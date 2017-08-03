@@ -3,6 +3,9 @@ from datetime import timedelta, time, datetime
 from pyexcel import Sheet
 from collections import OrderedDict
 from app.database import db_session, pg_session
+from app.report.utils.string_template import DeltaTemplate
+from operator import add
+from functools import reduce
 
 
 def results_to_dict(ptr):
@@ -10,21 +13,32 @@ def results_to_dict(ptr):
     return [dict(zip(col_names, row)) for row in ptr]   # Column: Cell pairs
 
 
-def events_cache(records):
-    new_records = []
-    for record in records:
-        new_group = {}
-        for event in record.events:
-            # Check if the event type is in the accumulator
-            accumulated_events = new_group.get(
-                event.event_type,
-                timedelta(0)
-            )
-            accumulated_events += event.end_time - event.start_time
-            new_group[event.event_type] = accumulated_events
-        # print(new_group)
-        new_records.append((record, new_group))
-    return new_records
+def chunks(l, chunk_size=1):
+    """Yield successive chunk_size-d chunks from l."""
+    for i in range(0, len(l), chunk_size):
+        yield l[i:i + chunk_size]
+
+
+def make_programmatic_column(report, tgt_column='', lh_values=(), rh_values=()):
+    # Iterators can use next
+    # print(make_printable_table(report))
+    rows = iter(report.rownames)
+
+    def programmed_column(cell):
+        # Get the next row on subsequent calls
+        tgt_row = next(rows)
+        # Reduce avoids handling int vs timedelta addition
+        numerator = reduce(add, [report[tgt_row, lh_value] for lh_value in lh_values])
+        denominator = reduce(add, [report[tgt_row, rh_value] for rh_value in rh_values])
+        try:
+            cell = numerator / denominator
+        except ZeroDivisionError:
+            pass
+
+        return cell
+
+    report.column.format(tgt_column, programmed_column)
+    return report
 
 
 def get_records(call_model, event_model, get_date):
@@ -53,9 +67,9 @@ def get_records(call_model, event_model, get_date):
                                if call_event.call_id == call.call_id]:
                 call.add_event(call_event)
 
-            # print('adding call', call.call_id, flush=True)
             # Add foreign records to current session
             db_session.add(call)
+        print('committing')
         try:
             db_session.commit()
         except IntegrityError:
@@ -67,16 +81,6 @@ def get_records(call_model, event_model, get_date):
 
 def chop_microseconds(delta):
     return delta - timedelta(microseconds=delta.microseconds)
-
-
-def async_worker(record_ids, table, session):
-    printed = False
-    for record_id in record_ids:
-        record = session.query(table).get(record_id)
-        if not printed:
-            print(record.events)
-            printed = True
-        yield record
 
 
 def make_pyexcel_table(headers, row_names, default_row, with_summary=False):
@@ -101,30 +105,58 @@ def make_pyexcel_table(headers, row_names, default_row, with_summary=False):
 
 
 def run_filters(records):
-    print('my records', flush=True)
-    print(records[0], records[-1], flush=True)
-    for x in range(0, len(records)):
-        match_record = records[x]
-        matches = match(records[x + 1:], match_val=match_record)
-        if (
-                len(matches) > 1
-                and (match_record[0].end_time - match_record[0].start_time > timedelta(seconds=20))
-                and match_record[1].get(10, timedelta(0)) == timedelta(0)
-        ):
-            print(matches)
-            # TODO this is the spot that is inefficient
-            # for a_match in matches:
-            #     print(a_match)
-                # for i, o in enumerate(records):
-                #     if o[0].call_id == a_match:
-                #         print('removing record id for', records[i])
-                #         del records[i]
-                #         break
+    # print('my record', len(records), flush=True)
+    print(records)
+    # print(records[0][0].call_id, records[-1][0].call_id, flush=True)
+    # reversed_records = reversed(records)
+    # for record in reversed_records:
+    #     next_record = next(reversed_records)
+    #     matched = record[0].dialed_party_number == next_record[0].dialed_party_number
+    #     if matched:
+    #         print('found matching call', record[0].call_id)
+    #         if (record[0].start_time - next_record[0].end_time) < timedelta(seconds=20):
+    #             print('found duplicate', record[0].call_id)
+    #             del record
+    #             print('deleted record')
+    # # for x in range(0, len(records)):
+    #     # match_record = records[x]
+    #     # matches = match(records[x + 1:], match_val=match_record)
+    #     # if (
+    #     #         len(matches) > 1
+    #     #         and (match_record[0].end_time - match_record[0].start_time > timedelta(seconds=20))
+    #     #         and match_record[1].get(10, timedelta(0)) == timedelta(0)
+    #     # ):
+    #     #     print(matches)
+    #         # TODO this is the spot that is inefficient
+    #         # for a_match in matches:
+    #         #     print(a_match)
+    #             # for i, o in enumerate(records):
+    #             #     if o[0].call_id == a_match:
+    #             #         print('removing record id for', records[i])
+    #             #         del records[i]
+    #             #         break
+    # print('returning records')
+    # print(list(reversed_records))
     return records
 
 
+def strfdelta(tdelta, fmt):
+    d = {"D": tdelta.days}
+    d["H"], rem = divmod(tdelta.seconds, 3600)
+    d["M"], d["S"] = divmod(rem, 60)
+    d = {k: '{0:02d}'.format(v) for k, v in d.items()}
+    t = DeltaTemplate(fmt)
+    return t.substitute(**d)
+
+
 def format_table(v):
-    return str(v)
+    if isinstance(v, (int, str)):
+        v = str(v)
+    elif isinstance(v, timedelta):
+        v = strfdelta(v, '%D days %H:%M:%S' if v > timedelta(days=1) else '%H:%M:%S')
+    elif isinstance(v, float):
+        v = '{0:.1%}'.format(v)
+    return v
 
 
 def process_report(in_process_report, records):
@@ -184,83 +216,12 @@ def process_report(in_process_report, records):
                 in_process_report[row_name, 'I/C Abandoned'] += 1
                 in_process_report[row_name, 'Average Wait Lost'] += call_duration
 
-    db_session.remove()
     return in_process_report
 
 
 def make_printable_table(raw_format_table):
     raw_format_table.map(format_table)
     return raw_format_table
-    # for row_name in test_output.rownames:
-    #     row_name = str(row_name)
-    #     try:
-    #         test_output[row_name, 'Incoming Live Answered (%)'] = '{0:.1%}'.format(
-    #             test_output[row_name, 'I/C Live Answered'] / test_output[row_name, 'I/C Presented']
-    #         )
-    #     except ZeroDivisionError:
-    #         test_output[row_name, 'Incoming Live Answered (%)'] = '{0:.1%}'.format(1.0)
-    #
-    #     try:
-    #         test_output[row_name, 'Incoming Live Answered (%)'] = '{0:.1%}'.format(
-    #             test_output[row_name, 'I/C Live Answered'] / test_output[row_name, 'I/C Presented']
-    #         )
-    #     except ZeroDivisionError:
-    #         test_output[row_name, 'Incoming Live Answered (%)'] = '{0:.1%}'.format(1.0)
-    #
-    #     try:
-    #         test_output[row_name, 'Incoming Received (%)'] = '{0:.1%}'.format(
-    #             (test_output[row_name, 'I/C Live Answered'] + test_output[row_name, 'Voice Mails'])
-    #             / test_output[row_name, 'I/C Presented']
-    #         )
-    #     except ZeroDivisionError:
-    #         test_output[row_name, 'Incoming Received (%)'] = '{0:.1%}'.format(1.0)
-    #
-    #     try:
-    #         test_output[row_name, 'Incoming Abandoned (%)'] = '{0:.1%}'.format(
-    #             test_output[row_name, 'I/C Abandoned'] / test_output[row_name, 'I/C Presented']
-    #         )
-    #     except ZeroDivisionError:
-    #         test_output[row_name, 'Incoming Abandoned (%)'] = '{0:.1%}'.format(1.0)
-    #
-    #     try:
-    #         test_output[row_name, 'Average Incoming Duration'] = str(
-    #             chop_microseconds(
-    #                 test_output[row_name, 'Average Incoming Duration'] / test_output[row_name, 'I/C Live Answered'])
-    #         )
-    #     except ZeroDivisionError:
-    #         test_output[row_name, 'Average Incoming Duration'] = '0:00:00'
-    #     except TypeError:
-    #         print(row_name, test_output[row_name, 'Average Incoming Duration'],
-    #               test_output[row_name, 'I/C Live Answered'])
-    #         raise
-    #
-    #     # print(test_output[row_name, 'Average Wait Answered'])
-    #     try:
-    #         test_output[row_name, 'Average Wait Answered'] = str(
-    #             chop_microseconds(
-    #                 test_output[row_name, 'Average Wait Answered'] / test_output[row_name, 'I/C Live Answered'])
-    #         )
-    #     except ZeroDivisionError:
-    #         test_output[row_name, 'Average Wait Answered'] = '0:00:00'
-    #
-    #     try:
-    #         test_output[row_name, 'Average Wait Lost'] = str(
-    #             chop_microseconds(test_output[row_name, 'Average Wait Lost'] / test_output[row_name, 'I/C Abandoned'])
-    #         )
-    #     except ZeroDivisionError:
-    #         test_output[row_name, 'Average Wait Lost'] = '0:00:00'
-    #
-    #     test_output[row_name, 'Longest Waiting Answered'] = str(
-    #         chop_microseconds(test_output[row_name, 'Longest Waiting Answered'])
-    #     )
-    #
-    #     try:
-    #         test_output[row_name, 'PCA'] = '{0:.1%}'.format(
-    #             (test_output[row_name, 'Calls Ans Within 15'] + test_output[row_name, 'Calls Ans Within 30'])
-    #             / test_output[row_name, 'I/C Presented']
-    #         )
-    #     except ZeroDivisionError:
-    #         test_output[row_name, 'PCA'] = '{0:.1%}'.format(1.0)
 
 
 def match(record_list, match_val=None):
