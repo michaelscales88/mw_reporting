@@ -1,7 +1,7 @@
 version: '2'
 
 services:
-  web:
+  mw_reporting:
     build:
       context: ..
       dockerfile: ./deployment/Dockerfile
