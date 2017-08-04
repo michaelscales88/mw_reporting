@@ -12,16 +12,16 @@ db_session = scoped_session(sessionmaker(autocommit=False,
                                          bind=db_engine))
 
 # Source db
-pg_engine = create_engine(app.config['PG_CONNECTION'])
-pg_session = scoped_session(sessionmaker(autocommit=False,
-                                         autoflush=False,
-                                         bind=pg_engine))
+# pg_engine = create_engine(app.config['PG_CONNECTION'])
+# pg_session = scoped_session(sessionmaker(autocommit=False,
+#                                          autoflush=False,
+#                                          bind=pg_engine))
 
 # MS SQL db
-ms_engine = create_engine(app.config['MSSQL_CONNECTION'])
-ms_session = scoped_session(sessionmaker(autocommit=False,
-                                         autoflush=False,
-                                         bind=ms_engine))
+# ms_engine = create_engine(app.config['MSSQL_CONNECTION'])
+# ms_session = scoped_session(sessionmaker(autocommit=False,
+#                                          autoflush=False,
+#                                          bind=ms_engine))
 
 Base = declarative_base()
 Base.query = db_session.query_property()

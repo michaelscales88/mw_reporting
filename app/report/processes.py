@@ -2,7 +2,7 @@ from sqlalchemy.exc import IntegrityError
 from datetime import timedelta, time, datetime
 from pyexcel import Sheet
 from collections import OrderedDict
-from app.database import db_session, pg_session
+from app.database import db_session  # pg_session
 from app.report.utils.string_template import DeltaTemplate
 from operator import add
 from functools import reduce
