@@ -10,7 +10,7 @@ from app.core import get_redirect_target
 # Module imports
 from . import excel
 from .models import CallTable, EventTable
-from .core import configure_query, run_report, get_query, parse_date_range
+from .core import configure_query, run_report, parse_date_range
 
 bp = Blueprint(
     'report',

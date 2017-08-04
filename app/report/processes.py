@@ -21,7 +21,6 @@ def chunks(l, chunk_size=1):
 
 def make_programmatic_column(report, tgt_column='', lh_values=(), rh_values=()):
     # Iterators can use next
-    # print(make_printable_table(report))
     rows = iter(report.rownames)
 
     def programmed_column(cell):

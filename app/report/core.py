@@ -217,34 +217,3 @@ def run_report(query):
 def parse_date_range(date_range):
     start, end = date_range.split(' - ')
     return parse(start), parse(end)
-
-
-def get_query(session, models, dates):
-    CallTable = models.get('calltable')
-    EventTable = models.get('eventtable')
-    start, end = parse_date_range(dates)
-
-    get_dates = []
-    iter_date = start
-    # Do a cheap lookup whether we need to get records
-    while iter_date <= end:
-        found = records_exist(session, CallTable, iter_date)
-        if not found:
-            get_dates += [iter_date.date()]
-        iter_date += timedelta(days=1)
-
-    if get_dates:
-        # Make the Pool of workers
-        pool = ThreadPool(current_app.config['THREAD_LIMIT'])
-
-        # Get records from foreign database
-        print('found dates', dates)
-        # results = pool.starmap(get_records, zip(repeat(CallTable), repeat(EventTable), dates))
-
-        # close the pool and wait for the work to finish
-        pool.close()
-        pool.join()
-
-    query = query_by_range(session, CallTable, start, end)
-
-    return query

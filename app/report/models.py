@@ -53,6 +53,7 @@ class CallTable(Base):
         return event in events
 
     def __lt__(self, other):
+        # Gives CallTable a sortable property
         return self.call_id < other.call_id
 
 
