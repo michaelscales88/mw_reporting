@@ -39,12 +39,46 @@
           </provider>
         </entry>
       </file>
+<<<<<<< Updated upstream
       <file leaf-file-name="docker-compose.yml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/deployment/docker-compose.yml">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="51">
               <caret line="3" column="14" lean-forward="false" selection-start-line="3" selection-start-column="14" selection-end-line="3" selection-end-column="14" />
               <folding />
+=======
+      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/report/views.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="180">
+              <caret line="12" column="45" lean-forward="false" selection-start-line="12" selection-start-column="45" selection-end-line="12" selection-end-column="45" />
+              <folding>
+                <element signature="e#970#1533#0" expanded="false" />
+                <marker date="1501861166000" expanded="true" signature="3177:3220" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="processes.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/report/processes.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-256">
+              <caret line="23" column="0" lean-forward="false" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#41#0" expanded="true" />
+                <element signature="e#344#480#0" expanded="false" />
+                <element signature="e#1395#2735#0" expanded="false" />
+                <element signature="e#2772#2829#0" expanded="false" />
+                <element signature="e#2914#3306#0" expanded="false" />
+                <element signature="e#4938#5155#0" expanded="false" />
+                <element signature="e#5183#5428#0" expanded="false" />
+                <element signature="e#8453#9479#0" expanded="false" />
+                <element signature="e#9558#10103#0" expanded="false" />
+                <element signature="e#10272#11191#0" expanded="false" />
+                <element signature="e#12139#12211#0" expanded="false" />
+              </folding>
+>>>>>>> Stashed changes
             </state>
           </provider>
         </entry>
@@ -52,8 +86,30 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< Updated upstream
             <state relative-caret-position="68">
               <caret line="4" column="26" lean-forward="false" selection-start-line="4" selection-start-column="26" selection-end-line="4" selection-end-column="26" />
+              <folding />
+=======
+            <state relative-caret-position="614">
+              <caret line="219" column="0" lean-forward="false" selection-start-line="219" selection-start-column="0" selection-end-line="219" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#41#0" expanded="true" />
+                <element signature="e#3351#3896#0" expanded="false" />
+                <element signature="e#3916#4605#0" expanded="false" />
+                <element signature="e#4622#5833#0" expanded="false" />
+                <element signature="e#6644#6716#0" expanded="false" />
+              </folding>
+>>>>>>> Stashed changes
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="secret_stuff.yml" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/instance/secret_stuff.yml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="4" column="0" lean-forward="true" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -159,6 +215,7 @@
         <option value="$PROJECT_DIR$/app/report/sla_report.py" />
         <option value="$PROJECT_DIR$/app/default_config.py" />
         <option value="$PROJECT_DIR$/app/report/utils/string_template.py" />
+<<<<<<< Updated upstream
         <option value="$PROJECT_DIR$/app/report/views.py" />
         <option value="$PROJECT_DIR$/app/report/core.py" />
         <option value="$PROJECT_DIR$/app/report/models.py" />
@@ -171,6 +228,13 @@
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/deployment/docker-compose.yml" />
         <option value="$PROJECT_DIR$/deployment/Dockerfile" />
+=======
+        <option value="$PROJECT_DIR$/app/report/models.py" />
+        <option value="$PROJECT_DIR$/app/report/utils/materialized_view_factory.py" />
+        <option value="$PROJECT_DIR$/app/report/processes.py" />
+        <option value="$PROJECT_DIR$/app/report/views.py" />
+        <option value="$PROJECT_DIR$/app/report/core.py" />
+>>>>>>> Stashed changes
       </list>
     </option>
   </component>
@@ -226,7 +290,43 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+<<<<<<< Updated upstream
               <option name="myItemId" value="deployment" />
+=======
+              <option name="myItemId" value="instance" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mWreporting" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mWreporting" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mWreporting" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mWreporting" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="user" />
+>>>>>>> Stashed changes
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -761,6 +861,7 @@
         </state>
       </provider>
     </entry>
+<<<<<<< Updated upstream
     <entry file="file://$PROJECT_DIR$/app/report/views.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1549">
@@ -776,6 +877,9 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/db_create.py">
+=======
+    <entry file="file://$PROJECT_DIR$/app/report/models.py">
+>>>>>>> Stashed changes
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
           <caret line="1" column="7" lean-forward="false" selection-start-line="1" selection-start-column="7" selection-end-line="1" selection-end-column="7" />
@@ -816,14 +920,44 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/deployment/docker-compose.yml">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< Updated upstream
         <state relative-caret-position="51">
           <caret line="3" column="14" lean-forward="false" selection-start-line="3" selection-start-column="14" selection-end-line="3" selection-end-column="14" />
           <folding />
+=======
+        <state relative-caret-position="180">
+          <caret line="12" column="45" lean-forward="false" selection-start-line="12" selection-start-column="45" selection-end-line="12" selection-end-column="45" />
+          <folding>
+            <element signature="e#970#1533#0" expanded="false" />
+            <marker date="1501861166000" expanded="true" signature="3177:3220" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/report/processes.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-256">
+          <caret line="23" column="0" lean-forward="false" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+            <element signature="e#344#480#0" expanded="false" />
+            <element signature="e#1395#2735#0" expanded="false" />
+            <element signature="e#2772#2829#0" expanded="false" />
+            <element signature="e#2914#3306#0" expanded="false" />
+            <element signature="e#4938#5155#0" expanded="false" />
+            <element signature="e#5183#5428#0" expanded="false" />
+            <element signature="e#8453#9479#0" expanded="false" />
+            <element signature="e#9558#10103#0" expanded="false" />
+            <element signature="e#10272#11191#0" expanded="false" />
+            <element signature="e#12139#12211#0" expanded="false" />
+          </folding>
+>>>>>>> Stashed changes
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/requirements.txt">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< Updated upstream
         <state relative-caret-position="306">
           <caret line="18" column="5" lean-forward="true" selection-start-line="18" selection-start-column="5" selection-end-line="18" selection-end-column="5" />
           <folding />
@@ -834,6 +968,24 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
           <caret line="17" column="20" lean-forward="true" selection-start-line="17" selection-start-column="20" selection-end-line="17" selection-end-column="20" />
+=======
+        <state relative-caret-position="614">
+          <caret line="219" column="0" lean-forward="false" selection-start-line="219" selection-start-column="0" selection-end-line="219" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+            <element signature="e#3351#3896#0" expanded="false" />
+            <element signature="e#3916#4605#0" expanded="false" />
+            <element signature="e#4622#5833#0" expanded="false" />
+            <element signature="e#6644#6716#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/instance/secret_stuff.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="0" lean-forward="true" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+>>>>>>> Stashed changes
           <folding />
         </state>
       </provider>
