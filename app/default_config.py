@@ -1,3 +1,4 @@
+from platform import system
 from os import urandom, path, environ
 
 
@@ -12,14 +13,20 @@ class Config(object):
     # Default frame settings
     ROWS_PER_PAGE = 50
 
-    # Model database
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(BASEDIR, 'app.db')
-    SQLALCHEMY_MIGRATE_REPO = path.join(BASEDIR, 'db_repository')
-    SQLALCHEMY_TRACK_MODIFICATIONS = False  # Turn this off to reduce overhead
+    this_system = system()
 
-    # indexing service
-    WHOOSH_BASE = path.join(BASEDIR, 'tmp/whoosh')
-    ENABLE_SEARCH = False
+    # Database stuff
+    if this_system == 'Darwin':
+        # Non docker database location
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(PACKAGEDIR, 'database', 'app.db')
+    elif this_system == 'Linux':
+        # Docker database location
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(PACKAGEDIR, 'app.db')
+    else:
+        SQLALCHEMY_DATABASE_URI = None
+
+    SQLALCHEMY_MIGRATE_REPO = path.join(PACKAGEDIR, 'database', 'db_repository')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False  # Turn this off to reduce overhead
 
     # email server
     MAIL_SERVER = 'smtp.googlemail.com'

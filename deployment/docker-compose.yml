@@ -1,9 +1,16 @@
 version: '2'
 
 services:
-  mw_reporting:
+  web:
     build:
       context: ..
-      dockerfile: ./deployment/Dockerfile
+      dockerfile: ./Dockerfile
+    expose:
+      - '8080'
     ports:
       - '8080:8080'
+    command: python main.py
+    volumes:
+      - ../app:/app/app
+      - ../instance/:/app/instance
+      - ../database/app.db:/app/app.db

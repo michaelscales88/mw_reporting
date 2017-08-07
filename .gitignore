@@ -60,7 +60,7 @@ local_settings.py
 # Flask stuff:
 instance/
 tmp/
-app/db_repository/
+database/db_repository/
 *.db
 .webassets-cache
 

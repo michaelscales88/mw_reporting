@@ -26,3 +26,5 @@ pytz
 redpanda
 six
 texttable
+psycopg2
+pymssql

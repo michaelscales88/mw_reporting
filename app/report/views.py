@@ -1,8 +1,6 @@
 from flask import render_template, g, Blueprint, jsonify
 from flask_login import login_required
-from json import dumps
 from datetime import datetime
-from collections import defaultdict
 
 # App imports
 from app.core import get_redirect_target

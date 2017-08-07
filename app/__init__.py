@@ -13,12 +13,6 @@ app.config.from_yaml('clients.yml', silent=True)
 app.config.from_yaml('secret_stuff.yml', silent=True)
 
 
-# Start the index service
-if app.config['ENABLE_SEARCH']:
-    from whooshalchemy import IndexService
-    si = IndexService(config=app.config)
-
-
 # Configure login page
 lm = LoginManager()
 lm.init_app(app)

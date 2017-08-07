@@ -9,5 +9,5 @@
     <annotation-enable>false</annotation-enable>
     <other-services-enabled>true</other-services-enabled>
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.5.2 virtualenv at C:\Users\mscales\Desktop\Development\mw_reporting\venv" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.5.1 virtualenv at ~/Desktop/local/environments/flask_venv" project-jdk-type="Python SDK" />
 </project>
