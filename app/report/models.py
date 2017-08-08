@@ -1,9 +1,8 @@
 from sqlalchemy import Column, Text, DateTime, Integer, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy_utils import generic_repr
 from app.database import Base
-from datetime import timedelta
 
 
 @generic_repr
@@ -24,9 +23,6 @@ class CallTable(Base):
     caller_id = Column(Text)
     inbound_route = Column(Text)
 
-    # parent-child relationship
-    events = relationship("EventTable", back_populates='call', lazy='joined')   # Iterable of EventTable objects
-
     @declared_attr
     def __tablename__(cls):
         return cls.__name__.lower()
@@ -37,20 +33,6 @@ class CallTable(Base):
         return """SELECT * FROM c_call WHERE to_char(c_call.start_time, 'YYYY-MM-DD') = '{date}'""".format(
             date=request_date
         )
-
-    def add_event(self, event):
-        if not self.tracked(event, self.events):
-            self.events.append(event)
-            return self
-
-    def remove_event(self, event):
-        if self.tracked(event, self.events):
-            self.events.remove(event)
-            return self
-
-    @staticmethod
-    def tracked(event, events):
-        return event in events
 
     def __lt__(self, other):
         # Gives CallTable a sortable property
@@ -74,10 +56,7 @@ class EventTable(Base):
     end_time = Column(DateTime, nullable=False)
     tag = Column(Text)
     recording_rule = Column(Integer)
-
-    # parent-child relationship
-    call_id = Column(Integer, ForeignKey('calltable.call_id'))
-    call = relationship("CallTable", back_populates="events")   # Stores the parent object by the ForeignKey
+    call_id = Column(Integer, ForeignKey(CallTable.call_id))
 
     @declared_attr
     def __tablename__(cls):
@@ -99,8 +78,19 @@ class ClientTable(Base):
     client_name = Column(Integer, unique=True, nullable=False)
     full_service = Column(Boolean, default=False)
 
+    users = relationship(
+        'User',
+        secondary='manager_client_link'
+    )
+
     @declared_attr
     def __tablename__(cls):
         return cls.__name__.lower()
 
 
+class ManagerClientLink(Base):
+    __tablename__ = 'manager_client_link'
+    manager_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
+    client_id = Column(Integer, ForeignKey('clienttable.client_id'), primary_key=True)
+    client = relationship(ClientTable, backref=backref("clienttable_assoc"))
+    user = relationship('User', backref=backref("user_assoc"))

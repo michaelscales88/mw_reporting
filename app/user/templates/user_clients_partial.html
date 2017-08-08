@@ -1,0 +1,37 @@
+<!-- Links section -->
+<div class="container-fluid">
+
+{#    {% for client in clients %}#}
+{#        <div class="row">#}
+{#            <div class="col-md-4">#}
+{#                <label for="{{ client.client_id|e }}">{{ client.client_name|e }}</label>#}
+{#                <small id="{{ client.client_id|e }}" class="form-text text-muted">{{ client.client_id|e }}</small>#}
+{#            </div>#}
+{#            <div class="col-md-4">#}
+{#                <div class="form-group">#}
+{#                    <label for="{{ client.client_id|e }}-link-name">Name:</label>#}
+{#                    <input id="{{ client.client_id|e }}-link-name" class="form-control"#}
+{#                           type="text" placeholder="{{ client.client_name|e }}">#}
+{#                </div>#}
+{#                <div class="form-group">#}
+{#                    <label for="{{ client.client_id|e }}-link-service">Full Service:</label>#}
+{#                    <input id="{{ client.client_id|e }}-link-service" class="form-control"#}
+{#                           type="text" placeholder="{{ client.full_service|e }}">#}
+{#                </div>#}
+{#            </div>#}
+{#            <div class="col-md-4">#}
+{#                <div class="form-group">#}
+{#                    <button class="btn btn-default" type="submit">#}
+{#                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>#}
+{#                    </button>#}
+{#                    <button class="btn btn-default" type="submit" name="remove" value="{{ client.id|e }}">#}
+{#                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>#}
+{#                    </button>#}
+{#                    <button class="btn btn-default" type="submit" name="delete" value="{{ client.id|e }}">#}
+{#                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>#}
+{#                    </button>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    {% endfor %}#}
+</div> <!-- User links container-fluid -->

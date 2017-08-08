@@ -1,17 +1,9 @@
-from sqlalchemy import Column, Text, DateTime, Integer, Table, ForeignKey
+from sqlalchemy import Column, Text, DateTime, Integer
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from sqlalchemy_utils import generic_repr
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.database import Base
-
-# Association Table
-managed_clients = Table(
-    'managed_clients',
-    Base.metadata,
-    Column('user_id', Integer, ForeignKey('user.id')),
-    Column('client_id', Integer, ForeignKey('clienttable.id'))
-)
 
 
 @generic_repr
@@ -28,13 +20,10 @@ class User(Base):
     about_me = Column(Text)
     last_seen = Column(DateTime)
 
-    # Many to many relationship Client Managers: Clients
-    clients = relationship('User',
-                           secondary=managed_clients,
-                           primaryjoin=(managed_clients.c.user_id == id),
-                           secondaryjoin=(managed_clients.c.client_id == id),
-                           backref=backref('managed_clients', lazy='dynamic'),
-                           lazy='dynamic')
+    clients = relationship(
+        'ClientTable',
+        secondary='manager_client_link'
+    )
 
     @declared_attr
     def __tablename__(cls):

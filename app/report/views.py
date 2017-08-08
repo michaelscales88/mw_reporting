@@ -24,7 +24,7 @@ bp = Blueprint(
 def index():
     next = get_redirect_target()
     return render_template(
-        'report.html',
+        'report_template.html',
         title='Data Gallery',
         next=next,
         columns=list(CallTable.__table__.columns.keys())
@@ -57,7 +57,7 @@ def report(report_type=''):
         'PCA'
     ]
     return render_template(
-        'report.html',
+        'report_template.html',
         title='{type} Report'.format(type=report_type.upper()),
         next=next,
         columns=list(output_headers)

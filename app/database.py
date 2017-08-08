@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session
 from redpanda.orm import sessionmaker
@@ -35,3 +35,8 @@ def init_db():
     from app.report import EventTable, CallTable
 
     Base.metadata.create_all(bind=db_engine)
+
+
+@event.listens_for(db_session, 'transient_to_pending')
+def object_is_pending(session, obj):
+    print('New pending in {session}: {object}'.format(session=session, object=obj))

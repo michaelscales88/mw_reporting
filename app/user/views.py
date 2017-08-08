@@ -7,6 +7,7 @@ from app.forms import LoginForm
 from app.database import db_session
 
 from .model import User
+from app.report.core import add_client, remove_client, delete_client
 
 
 bp = Blueprint('user', __name__, template_folder='templates', static_folder='static', static_url_path='/user/static')
@@ -17,22 +18,42 @@ bp = Blueprint('user', __name__, template_folder='templates', static_folder='sta
 @login_required
 def settings():
     next = get_redirect_target()
-    user = g.user
-    if not user:
+    if not g.user:
         redirect_back(
             url_for('index')
         )
 
-    if request.method == 'POST':
+    # Parser section
+    g.parser.add_argument('client_name', type=str, location='form')
+    g.parser.add_argument('client_id', type=str, location='form')
+    g.parser.add_argument('full_service', type=bool, location='form')
+    g.parser.add_argument('remove', type=str, location='form')
+    g.parser.add_argument('delete', type=str, location='form')
 
-        # Put all the changes to our templates in the session
+    args = g.parser.parse_args()
+
+    if request.method == 'POST' and args['remove']:
+
+        user = remove_client(args['remove'])
+        # Save change to session
+        g.session.add(user)
+
+    elif request.method == 'POST' and args['delete']:
+
+        # Delete needs to be committed to be saved
+        delete_client(g.session, args['delete'])
+
+    elif request.method == 'POST':
+
+        user = add_client(args['client_name'], args['client_id'], args['full_service'])
+        # Save change to session
         g.session.add(user)
 
     return render_template(
-        'settings.html',
+        'settings_template.html',
         title='Settings',
         next=next,
-        user=user
+        user=g.user
     )
 
 
@@ -74,7 +95,7 @@ def login():
                 flash('Successfully created login for', new_user.alias)
             return redirect(next)
     return render_template(
-        'login.html',
+        'login_template.html',
         title='Sign In',
         next=next,
         form=form
@@ -86,4 +107,4 @@ def login():
 def logout():
     logout_user()
     flash('Successfully logged out.')
-    return redirect(url_for('index'))
+    return redirect_back(url_for('index'))

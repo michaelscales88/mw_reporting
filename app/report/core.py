@@ -1,13 +1,18 @@
 from sqlalchemy.inspection import inspect
 from sqlalchemy.sql import func, and_, exists
-from flask import current_app
 from pandas import DataFrame, Series
 from dateutil.parser import parse
 from datetime import timedelta, datetime
 from collections import OrderedDict
-from itertools import repeat
-from .processes import chunks, make_programmatic_column, make_pyexcel_table, make_printable_table, run_filters, process_report
 from multiprocessing.dummy import Pool as ThreadPool
+
+# Access app variables from module
+from flask import current_app
+from flask_login import current_user
+
+# Module imports
+from .models import ClientTable, ManagerClientLink
+from .processes import chunks, make_programmatic_column, make_pyexcel_table, make_printable_table, run_filters, process_report
 
 
 def query_by_range(session, call_table, start, end):
@@ -217,3 +222,29 @@ def run_report(query):
 def parse_date_range(date_range):
     start, end = date_range.split(' - ')
     return parse(start), parse(end)
+
+
+def add_client(client_name, client_id, full_service):
+    new_client = ClientTable(client_name=client_name, client_id=client_id, full_service=full_service)
+    current_user.add_client(new_client)
+    return current_user
+
+
+def remove_client(row_id):
+    client = ClientTable.query.get(row_id)
+    current_user.remove_client(client)
+    return current_user
+
+
+def delete_client(session, row_id):
+    client = ClientTable.query.get(row_id)
+    manager_count = session.query(ManagerClientLink).with_parent(client, 'users').count()
+    print(manager_count)
+    if manager_count == 0:
+        # ClientTable.query.filter(ClientTable.id == row_id).delete()
+        client.delete()
+    else:
+        print('Managers exist')
+        # Check if they want to proceed
+        # Remove all the relationships
+        # ClientTable.query.filter(ClientTable.id == row_id).delete()

@@ -17,7 +17,7 @@
     <div class="container-fluid padded">
         <div class="container-fluid text-centered padded">
             <!-- Button trigger modal -->
-            {% include 'query_properties.html' %}
+            {% include 'query_properties_partial.html' %}
             <table id="displayTable" class="display" cellspacing="0" width="100%">
                 <!-- Configure the headers for the ajax call-->
                 <thead><tr>{% for column in columns %}<th>{{ column }}</th>{% endfor %}</tr></thead>

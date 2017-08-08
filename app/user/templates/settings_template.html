@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block extracss %}
+    {{ super() }}
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('user.static', filename='settings.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('user.static', filename='bootstrap-transfer.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid padded">
+        <h1>Edit Profile</h1>
+        <div class="container-fluid text-centered padded">
+            <form class="form-group" role="form" method="POST"
+                  target="{{ url_for('user.settings') }}" enctype=multipart/form-data>
+
+                <section>
+                    <h3>User Info</h3>
+                    <code>
+                        {% include 'user/account_settings_partial.html' %}
+                    </code>
+                </section>
+
+                <aside>
+                    <h3>Avatar</h3>
+                    <code>
+                        {% include 'user/avatar_area_partial.html' %}
+                    </code>
+                </aside>
+
+                <footer>
+                    <code>
+                        <button class="btn btn-secondary" type="submit" id="user-form">Save</button>
+                        <button class="btn btn-secondary" type="reset" id="user-form">Cancel</button>
+                    </code>
+                </footer>
+            </form>
+        </div>   <!-- User form container-fluid -->
+        <div class="container-fluid text-centered padded">
+            <form class="form-group" role="form" method="POST" target="">
+
+            <h3>My Clients</h3>
+            <div id="user-clients" style="width:400px">
+            </div>
+            </form>
+        </div>  <!-- User client list container-fluid -->
+
+        <div class="container-fluid text-centered padded">
+            <h3>Client List</h3>
+            <form class="form-group" role="form" method="POST" target="">
+                <code>
+                    {% include 'add_clients/add_client_partial.html' %}
+                    {% set clients = user.clients %}
+                    {% include 'add_clients/client_list_partial.html' %}
+                </code>
+            </form>
+        </div>  <!-- Client List container-fluid -->
+
+    </div>  <!-- Page container-fluid -->
+{% endblock %}
+
+{% block extrajs %}
+    {{ super() }}
+    <script src="{{url_for('user.static', filename='bootstrap-transfer.js')}}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            let t = $('#user-clients').bootstrapTransfer(
+                {'target_id': 'multi-select-input',
+                 'height': '15em',
+                 'hilite_selection': true});
+
+            t.populate([
+                {value:"1", content:"Apple"},
+                {value:"2", content:"Orange"},
+                {value:"3", content:"Banana"},
+                {value:"4", content:"Peach"},
+                {value:"5", content:"Grapes"}
+            ]);
+            //t.set_values(["2", "4"]);
+            //console.log(t.get_values());
+        });
+    </script>
+{% endblock %}

@@ -40,8 +40,17 @@ def teardown(error):
 
     # Catch all for any add
     if session:
-        session.commit()
-        session.remove()
+        try:
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            session.flush()
+            print(e)
+            print('rollback and flush')
+            # raise
+        finally:
+            session.remove()
+            print('removed')
 
 
 @app.errorhandler(404)
@@ -51,5 +60,6 @@ def not_found_error(error):
 
 @app.errorhandler(500)
 def internal_error(error):
+    print('found the 500 error')
     db_session.rollback()
     return render_template('500.html'), 500
