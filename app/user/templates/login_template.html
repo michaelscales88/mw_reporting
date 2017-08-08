@@ -7,27 +7,33 @@
 
 {% block content %}
     <div class="container-fluid padded">
-        <form action="" method="POST" name="login">
-            {{ form.hidden_tag() }}
-                <section>
-                    <h1>Sign In</h1>
-                    <code>{{ form.login(class="form-control", placeholder="Login") }}</code>
-                    <code>{{ form.password(class="form-control", placeholder="Password") }}</code>
-                    <code>
-                        {{ form.remember_me }} Remember Me
-                        <button class="btn" type="submit" value="login">Login</button>
-                    </code>
-                </section>
+        <form method="POST">
+            <div class="row text-centered padded">
+                <h1>Sign In</h1>
+                <div class="form-group col-md-4">
+                    <label for="user-name">
+                        <span class="glyphicon glyphicon-user" aria-hidden="true">&nbsp;</span>
+                    </label>
+                    <input id="user-name" type="text" title="Enter your username..."
+                           placeholder="Username" name="user_name" class="form-control">
+                    <BR>
+                    <label for="user-password">
+                        <span class="glyphicon glyphicon-usd" aria-hidden="true">&nbsp;</span>
+                    </label>
+                    <input id="user-password" type="password" title="Enter your password..."
+                           placeholder="Password" name="password" class="form-control">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="user-remember">Remember me:</label>
+                    <input id="user-remember" type="checkbox" title="Rememer me" name="remember_me"
+                           class="form-control">
+                </div>
+                <div class="form-group col-md-4">
+                    <button class="btn btn-default" type="submit">Login</button>
+                    <button class="btn btn-default" type="reset">Cancel</button>
+                </div>
+            </div>
             <input type=hidden value="{{ next or '' }}" name=next>
-        {% if form.login.errors %}
-            <aside>
-                <code>
-                    {% for error in form.login.errors %}
-                        <span style="color: red;">[{{error}}]</span>
-                    {% endfor %}
-                </code>
-            </aside>
-        {% endif %}
         </form>
     </div>
 {% endblock %}

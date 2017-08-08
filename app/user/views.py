@@ -3,7 +3,6 @@ from flask_login import login_user, logout_user, login_required
 
 from app.core import redirect_back
 from app.core import get_redirect_target
-from app.forms import LoginForm
 from app.database import db_session
 
 from .model import User
@@ -61,44 +60,46 @@ def settings():
 def login():
 
     next = get_redirect_target()
-    form = LoginForm()
+    if g.user and g.user.is_authenticated:
+        redirect_back(
+            url_for('index')
+        )
+
+    # Parser section
+    g.parser.add_argument('user_name', type=str, location='form')
+    g.parser.add_argument('password', type=str, location='form')
+    g.parser.add_argument('remember_me', type=bool, location='form')
+    args = g.parser.parse_args()
 
     if request.method == 'POST':
-        if g.user and g.user.is_authenticated:
-            pass
-        elif form.validate_on_submit():
-            email = form.login.data
-            password = form.password.data
-            remember = form.remember_me.data
-            user = g.session.query(User).filter(User.email == email).first()
+        user = g.session.query(User).filter(User.email == args['user_name']).first()
 
-            if user:
-                if user.verify_password(password):
-                    # Not confident this is working as advertised
-                    print('logging in remember me is', remember)
-                    success = login_user(user, remember=remember)
-                    flash('Login {s}.'.format(s='success!' if success else 'failed!'))
+        if user:
+            if user.verify_password(args['password']):
+                # Not confident this is working as advertised
+                print('logging in remember me is', args['remember_me'])
+                success = login_user(user, remember=args['remember_me'])
+                flash('Login {s}.'.format(s='success!' if success else 'failed!'))
 
-                    if next == url_for('user.login') and success:
-                        next = ''
+                if next == url_for('user.login') and success:
+                    next = ''
 
-                    if not success:
-                        flash('Invalid username or password.')
-                else:
+                if not success:
                     flash('Invalid username or password.')
             else:
-                nickname = email.split('@')[0]
-                nickname = User.make_unique_display_name(nickname)
-                new_user = User(alias=nickname, email=email, password=password)
-                db_session.add(new_user)
-                db_session.commit()
-                flash('Successfully created login for', new_user.alias)
-            return redirect(next)
+                flash('Invalid username or password.')
+        else:
+            nickname = args['user_name'].split('@')[0]
+            nickname = User.make_unique_display_name(nickname)
+            new_user = User(alias=nickname, email=args['user_name'], password=args['password'])
+            db_session.add(new_user)
+            db_session.commit()
+            flash('Successfully created login for', new_user.alias)
+        return redirect(next)
     return render_template(
         'login_template.html',
         title='Sign In',
-        next=next,
-        form=form
+        next=next
     )
 
 

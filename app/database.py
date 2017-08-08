@@ -37,6 +37,12 @@ def init_db():
     Base.metadata.create_all(bind=db_engine)
 
 
-@event.listens_for(db_session, 'transient_to_pending')
-def object_is_pending(session, obj):
-    print('New pending in {session}: {object}'.format(session=session, object=obj))
+# @event.listens_for(db_session, 'transient_to_pending')
+# def object_is_pending(session, obj):
+#     print('New pending in {session}: {object}'.format(session=session, object=obj))
+
+
+@event.listens_for(ms_engine, 'begin')
+@event.listens_for(pg_engine, 'begin')
+def receive_begin(conn):
+    conn.execute('SET TRANSACTION READ ONLY')

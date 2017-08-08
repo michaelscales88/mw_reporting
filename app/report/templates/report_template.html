@@ -15,7 +15,7 @@
 
 {% block content %}
     <div class="container-fluid padded">
-        <div class="container-fluid text-centered padded">
+        <div class="row text-centered padded">
             <!-- Button trigger modal -->
             {% include 'query_properties_partial.html' %}
             <table id="displayTable" class="display" cellspacing="0" width="100%">
@@ -34,12 +34,6 @@
 
     <!-- Include dataTable -->
     <script type="text/javascript" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
-
-    {#    <script type="text/javascript" src="//cdn.datatables.net/fixedheader/3.1.2/js/dataTables.fixedHeader.min.js"></script>#}
-
-
-    <!-- Submit form for DataTable /w DataTable -->
-    {#    <script type="text/javascript" src="{{ url_for('report.static', filename='submit_form.js') }}"></script>#}
 
     <!-- Datepicker, Modal and DataTable JS -->
     <script type="text/javascript">
