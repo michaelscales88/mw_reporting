@@ -46,3 +46,6 @@ def init_db():
 @event.listens_for(pg_engine, 'begin')
 def receive_begin(conn):
     conn.execute('SET TRANSACTION READ ONLY')
+
+# Want to create metadata during app initialization after the engine is created
+init_db()

@@ -57,8 +57,6 @@ class DbManager(object):
                 self._d[key] = getattr(obj, key)
 
     def create(self):
-        # database.init_db()
-
         if not path.exists(self.config['SQLALCHEMY_MIGRATE_REPO']):
             api.create(self.config['SQLALCHEMY_MIGRATE_REPO'], 'database repository')
             api.version_control(
