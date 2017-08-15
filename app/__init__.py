@@ -13,7 +13,7 @@ deployed = system() == 'Linux'
 app = Flask(
     __name__,
     instance_relative_config=True,
-    instance_path='/tmp/' if deployed else '',
+    instance_path='/tmp/' if deployed else None,
     static_folder='static',
     template_folder='templates'
 )
@@ -21,7 +21,7 @@ app = Flask(
 
 # Load default templates
 app.config.from_object(
-    'app.default_config.ProductionConfig'
+    'app.default_config.TestingConfig'
 ) if deployed else app.config.from_object(
     'app.default_config.DevelopmentConfig'
 )

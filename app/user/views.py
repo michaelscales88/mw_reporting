@@ -103,9 +103,9 @@ def login():
     )
 
 
-@bp.route("/logout")
+@bp.route("/logout", methods=['GET'])
 @login_required
 def logout():
     logout_user()
     flash('Successfully logged out.')
-    return redirect_back(url_for('index'))
+    return redirect(url_for('index'))

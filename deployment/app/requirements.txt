@@ -9,7 +9,6 @@ MarkupSafe
 PyYAML
 SQLAlchemy
 SQLAlchemy-utils
-Werkzeug
 aniso8601
 click
 itsdangerous
@@ -26,3 +25,4 @@ six
 texttable
 psycopg2
 uwsgi
+migrate

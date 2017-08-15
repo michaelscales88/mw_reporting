@@ -31,7 +31,8 @@ class Config(object):
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(Config.PACKAGEDIR, 'app.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join('/database', 'app.db')
+    SQLALCHEMY_MIGRATE_REPO = path.join('/database', 'db_repository')
 
 
 class DevelopmentConfig(Config):
@@ -41,8 +42,7 @@ class DevelopmentConfig(Config):
 
 
 class TestingConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + ':memory:'
-    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join('/database', 'app.db')
+    SQLALCHEMY_MIGRATE_REPO = path.join('/database', 'db_repository')
     DEBUG = True
-    WTF_CSRF_ENABLED = False
     SQLALCHEMY_ECHO = False

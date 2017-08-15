@@ -9,8 +9,8 @@ services:
     command: uwsgi --ini app.ini
     volumes:
       - ../app:/app/app
-      - ../database/app.db:/app/app.db
       - ../instance:/tmp
+      - ../database:/database
   nginx:
     restart: always
     build:
