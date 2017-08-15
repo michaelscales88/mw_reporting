@@ -10,4 +10,5 @@ RUN pip install --requirement /tmp/requirements.txt
 WORKDIR /app
 
 COPY deployment/app/app.ini /app
+COPY deployment/app/__init__.py /app
 COPY wsgi.py .

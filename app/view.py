@@ -18,6 +18,7 @@ def catch_all():
 def index():
     # User module is accessed through the navigation bar
     loaded_modules = [name for name in current_app.blueprints.keys() if name != 'user']
+    print(loaded_modules)
     return render_template(
         'index.html',
         title='Index',

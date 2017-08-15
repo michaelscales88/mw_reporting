@@ -4,7 +4,7 @@ upstream flask {
 
 server {
     listen 80;
-    server_name localhost.com;
+    server_name localhost;
 
     location / {
     include uwsgi_params;

@@ -8,21 +8,22 @@
 
 {% block content %}
     <div class="container-fluid padded">
-        {% if blueprints %}
-            <h1>mW Reporting</h1>
-            <section>
-                {% for blueprint in blueprints %}
-                    <div class="input-group">
+        <h2 class="padded">mW Reporting</h2>
+        {% for blueprint in blueprints %}
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="{{ blueprint|e }}">
                         <h3><a href="{{ url_for('{bp}.index'.format(bp=blueprint)) }}">{{ blueprint }}</a></h3>
-                    </div>
-                {% endfor %}
-            </section>
-        {% else %}
-            <section>
-                <p>
-                    Else
-                </p>
-            </section>
-        {% endif %}
+                    </label>
+                    <small id="{{ blueprint|e }}" class="form-text text-muted">Some info</small>
+                </div>
+                <div class="col-md-4">
+                    <p>Client Info?</p>
+                </div>
+                <div class="col-md-4">
+                    <p>User info?</p>
+                </div>
+            </div>
+        {% endfor %}
     </div>  <!-- /.container-fluid -->
 {% endblock %}

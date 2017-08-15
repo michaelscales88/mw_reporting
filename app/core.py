@@ -10,6 +10,9 @@ def get_redirect_target():
             return target
         else:
             return abort(400)
+    else:
+        # Default to index
+        return 'index'
 
 
 def redirect_back(endpoint, **values):

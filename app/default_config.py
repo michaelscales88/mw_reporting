@@ -45,4 +45,5 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join('/database', 'app.db')
     SQLALCHEMY_MIGRATE_REPO = path.join('/database', 'db_repository')
     DEBUG = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = True  # Turn this off to reduce overhead
     SQLALCHEMY_ECHO = False

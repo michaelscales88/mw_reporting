@@ -1,9 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request, g, Blueprint
 from flask_login import login_user, logout_user, login_required
 
-from app.core import redirect_back
 from app.core import get_redirect_target
-from app.database import db_session
 
 from .model import User
 from app.report.core import add_client, remove_client, delete_client
@@ -16,9 +14,11 @@ bp = Blueprint('user', __name__, template_folder='templates', static_folder='sta
 @bp.route('/settings/', methods=['GET', 'POST'])
 @login_required
 def settings():
+
     next = get_redirect_target()
-    if not g.user:
-        redirect_back(
+
+    if not any((g.user, g.user.is_authenticated)):
+        return redirect(
             url_for('index')
         )
 
@@ -60,8 +60,9 @@ def settings():
 def login():
 
     next = get_redirect_target()
-    if g.user and g.user.is_authenticated:
-        redirect_back(
+
+    if all((g.user, g.user.is_authenticated)):
+        return redirect(
             url_for('index')
         )
 
@@ -74,27 +75,20 @@ def login():
     if request.method == 'POST':
         user = g.session.query(User).filter(User.email == args['user_name']).first()
 
-        if user:
-            if user.verify_password(args['password']):
-                # Not confident this is working as advertised
-                print('logging in remember me is', args['remember_me'])
-                success = login_user(user, remember=args['remember_me'])
-                flash('Login {s}.'.format(s='success!' if success else 'failed!'))
+        if user and user.verify_password(args['password']):
+            # Not confident this is working as advertised
+            print('logging in remember me is', args['remember_me'])
+            success = login_user(user, remember=args['remember_me'])
+            flash('Login {s}.'.format(s='success!' if success else 'failed!'))
 
-                if next == url_for('user.login') and success:
-                    next = ''
-
-                if not success:
-                    flash('Invalid username or password.')
-            else:
-                flash('Invalid username or password.')
         else:
             nickname = args['user_name'].split('@')[0]
             nickname = User.make_unique_display_name(nickname)
             new_user = User(alias=nickname, email=args['user_name'], password=args['password'])
-            db_session.add(new_user)
-            db_session.commit()
+            g.session.add(new_user)
+            g.session.commit()
             flash('Successfully created login for', new_user.alias)
+
         return redirect(next)
     return render_template(
         'login_template.html',
@@ -106,6 +100,6 @@ def login():
 @bp.route("/logout", methods=['GET'])
 @login_required
 def logout():
-    logout_user()
-    flash('Successfully logged out.')
+    success = logout_user()
+    flash('Logout {s}.'.format(s='success!' if success else 'failed!'))
     return redirect(url_for('index'))
