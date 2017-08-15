@@ -1,9 +1,8 @@
-from platform import system
 from os import urandom, path, environ
 
 
 class Config(object):
-    WTF_CSRF_ENABLED = True
+    # WTF_CSRF_ENABLED = True
     SECRET_KEY = urandom(24)     # Generate a random session key
 
     BASEDIR = path.abspath(path.dirname(__file__))
@@ -13,18 +12,7 @@ class Config(object):
     # Default frame settings
     ROWS_PER_PAGE = 50
 
-    this_system = system()
-
-    # Database stuff
-    if this_system == 'Darwin':
-        # Non docker database location
-        SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(PACKAGEDIR, 'database', 'app.db')
-    elif this_system == 'Linux':
-        # Docker database location
-        SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(PACKAGEDIR, 'app.db')
-    else:
-        SQLALCHEMY_DATABASE_URI = None
-
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(PACKAGEDIR, 'database', 'app.db')
     SQLALCHEMY_MIGRATE_REPO = path.join(PACKAGEDIR, 'database', 'db_repository')
     SQLALCHEMY_TRACK_MODIFICATIONS = False  # Turn this off to reduce overhead
 
@@ -43,7 +31,7 @@ class Config(object):
 
 
 class ProductionConfig(Config):
-    pass
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(Config.PACKAGEDIR, 'app.db')
 
 
 class DevelopmentConfig(Config):

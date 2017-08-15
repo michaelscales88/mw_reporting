@@ -18,7 +18,7 @@ pg_session = scoped_session(sessionmaker(autocommit=False,
                                          bind=pg_engine))
 
 # MS SQL db
-# ms_engine = create_engine(app.config['MSSQL_CONNECTION'])
+# ms_engine = create_engine(nginx.conf.config['MSSQL_CONNECTION'])
 # ms_session = scoped_session(sessionmaker(autocommit=False,
 #                                          autoflush=False,
 #                                          bind=ms_engine))

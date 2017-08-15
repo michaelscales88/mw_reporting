@@ -6,7 +6,7 @@ from datetime import timedelta, datetime
 from collections import OrderedDict
 from multiprocessing.dummy import Pool as ThreadPool
 
-# Access app variables from module
+# Access nginx.conf variables from module
 from flask import current_app
 from flask_login import current_user
 

@@ -4,13 +4,11 @@ Flask-Login
 Flask-Moment
 Flask-RESTful
 Flask-SQLAlchemy
-Flask-WTF
 Jinja2
 MarkupSafe
 PyYAML
 SQLAlchemy
 SQLAlchemy-utils
-WTForms
 Werkzeug
 aniso8601
 click
@@ -27,3 +25,4 @@ redpanda
 six
 texttable
 psycopg2
+uwsgi

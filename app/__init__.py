@@ -1,14 +1,32 @@
 from flask_login import LoginManager
 from flask_moment import Moment
+from platform import system
 
 from app.util.flask_extended import Flask
 
+
+# Need to make some decisions based on the file system
+deployed = system() == 'Linux'
+
+
 # store private information in instance
-app = Flask(__name__, instance_relative_config=True, static_folder='static', template_folder='templates')
+app = Flask(
+    __name__,
+    instance_relative_config=True,
+    instance_path='/tmp/' if deployed else '',
+    static_folder='static',
+    template_folder='templates'
+)
 
 
 # Load default templates
-app.config.from_object('app.default_config.DevelopmentConfig')
+app.config.from_object(
+    'app.default_config.ProductionConfig'
+) if deployed else app.config.from_object(
+    'app.default_config.DevelopmentConfig'
+)
+
+
 app.config.from_yaml('clients.yml', silent=True)
 app.config.from_yaml('secret_stuff.yml', silent=True)
 
