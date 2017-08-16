@@ -8,31 +8,20 @@
 
 {% block content %}
     <div class="container-fluid padded">
-        <h2 class="padded">Edit Profile</h2>
-        <div class="container-fluid text-centered padded">
-            <form class="form-group" role="form" method="POST"
-                  target="{{ url_for('user.settings') }}" enctype=multipart/form-data>
-
-                <section>
-                    <h3>User Info</h3>
-                    <code>
-                        {% include 'user/account_settings_partial.html' %}
-                    </code>
-                </section>
-
-                <aside>
-                    <h3>Avatar</h3>
-                    <code>
-                        {% include 'user/avatar_area_partial.html' %}
-                    </code>
-                </aside>
-
-                <footer>
-                    <code>
-                        <button class="btn btn-secondary" type="submit" id="user-form">Save</button>
-                        <button class="btn btn-secondary" type="reset" id="user-form">Cancel</button>
-                    </code>
-                </footer>
+        <div class="row padded">
+            <form class="form-group" role="form" method="POST">
+                <h2>Edit Profile</h2>
+                <div class="col-md-4">
+                    {% include 'user/account_settings_partial.html' %}
+                </div>
+                <h2>Edit Avatar</h2>
+                <div class="col-md-4">
+                    {% include 'user/avatar_area_partial.html' %}
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-secondary" type="submit">Save</button>
+                    <button class="btn btn-secondary" type="reset">Cancel</button>
+                </div>
             </form>
         </div>   <!-- User form container-fluid -->
         <div class="container-fluid text-centered padded">

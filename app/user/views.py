@@ -1,9 +1,8 @@
 from flask import render_template, flash, redirect, url_for, request, g, Blueprint
 from flask_login import login_user, logout_user, login_required
 
+from .core import new_user, existing_user
 from app.core import get_redirect_target
-
-from .model import User
 from app.report.core import add_client, remove_client, delete_client
 
 
@@ -11,11 +10,8 @@ bp = Blueprint('user', __name__, template_folder='templates', static_folder='sta
 
 
 @bp.route('/settings', methods=['GET', 'POST'])
-@bp.route('/settings/', methods=['GET', 'POST'])
 @login_required
 def settings():
-
-    next = get_redirect_target()
 
     if not any((g.user, g.user.is_authenticated)):
         return redirect(
@@ -51,7 +47,6 @@ def settings():
     return render_template(
         'settings_template.html',
         title='Settings',
-        next=next,
         user=g.user
     )
 
@@ -59,12 +54,12 @@ def settings():
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
 
-    next = get_redirect_target()
-
     if all((g.user, g.user.is_authenticated)):
         return redirect(
             url_for('index')
         )
+
+    next_tgt = get_redirect_target()
 
     # Parser section
     g.parser.add_argument('user_name', type=str, location='form')
@@ -73,27 +68,26 @@ def login():
     args = g.parser.parse_args()
 
     if request.method == 'POST':
-        user = g.session.query(User).filter(User.email == args['user_name']).first()
 
-        if user and user.verify_password(args['password']):
-            # Not confident this is working as advertised
-            print('logging in remember me is', args['remember_me'])
+        user = existing_user(g.session, args)
+
+        if not user:
+            user = new_user(args)
+            g.session.add(user)
+            g.session.commit()
+            flash('Successfully created login for', user.alias)
+
+        if user.verify_password(args['password']):
+            # User Login
             success = login_user(user, remember=args['remember_me'])
             flash('Login {s}.'.format(s='success!' if success else 'failed!'))
 
-        else:
-            nickname = args['user_name'].split('@')[0]
-            nickname = User.make_unique_display_name(nickname)
-            new_user = User(alias=nickname, email=args['user_name'], password=args['password'])
-            g.session.add(new_user)
-            g.session.commit()
-            flash('Successfully created login for', new_user.alias)
+        return redirect(next_tgt)
 
-        return redirect(next)
     return render_template(
         'login_template.html',
         title='Sign In',
-        next=next
+        next=next_tgt
     )
 
 

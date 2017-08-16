@@ -1,5 +1,4 @@
 from flask_login import LoginManager
-from flask_moment import Moment
 from platform import system
 
 from app.util.flask_extended import Flask
@@ -19,10 +18,8 @@ app = Flask(
 )
 
 
-# Load default templates
+# Get app settings
 app.config.from_object(
-    'app.default_config.TestingConfig'
-) if deployed else app.config.from_object(
     'app.default_config.DevelopmentConfig'
 )
 
@@ -37,11 +34,7 @@ lm.init_app(app)
 lm.login_view = 'user.login'
 
 
-# Render UTC dates based on browser settings
-moment = Moment(app)    # Also nice jquery and moment import
-
-
-# Import base view
+# Import base views
 from . import view
 
 

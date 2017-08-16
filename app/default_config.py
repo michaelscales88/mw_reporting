@@ -38,9 +38,3 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_TRACK_MODIFICATIONS = True  # Turn this off to reduce overhead
-
-
-class TestingConfig(Config):
-    DEBUG = True
-    SQLALCHEMY_TRACK_MODIFICATIONS = True  # Turn this off to reduce overhead
-    SQLALCHEMY_ECHO = False

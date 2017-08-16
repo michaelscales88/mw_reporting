@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Text, DateTime, Integer, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy_utils import generic_repr
 from app.database import Base
@@ -61,6 +62,10 @@ class EventTable(Base):
     @declared_attr
     def __tablename__(cls):
         return cls.__name__.lower()
+
+    @hybrid_property
+    def length(self):
+        return self.end_time - self.start_time
 
     @staticmethod
     def src_statement(request_date):

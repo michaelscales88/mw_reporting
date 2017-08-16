@@ -18,7 +18,7 @@ pg_session = scoped_session(sessionmaker(autocommit=False,
                                          bind=pg_engine))
 
 # MS SQL db
-# ms_engine = create_engine(nginx.conf.config['MSSQL_CONNECTION'])
+# ms_engine = create_engine(app.config['MSSQL_CONNECTION'])
 # ms_session = scoped_session(sessionmaker(autocommit=False,
 #                                          autoflush=False,
 #                                          bind=ms_engine))
@@ -37,12 +37,6 @@ def init_db():
     Base.metadata.create_all(bind=db_engine)
 
 
-# @event.listens_for(db_session, 'transient_to_pending')
-# def object_is_pending(session, obj):
-#     print('New pending in {session}: {object}'.format(session=session, object=obj))
-
-
-# @event.listens_for(ms_engine, 'begin')
 @event.listens_for(pg_engine, 'begin')
 def receive_begin(conn):
     conn.execute('SET TRANSACTION READ ONLY')

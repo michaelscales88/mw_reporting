@@ -1,7 +1,6 @@
 Flask
 Flask-Excel
 Flask-Login
-Flask-Moment
 Flask-RESTful
 Flask-SQLAlchemy
 Jinja2

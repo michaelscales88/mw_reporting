@@ -1,14 +1,14 @@
 from flask import render_template, g, Blueprint, jsonify
 from flask_login import login_required
-from datetime import datetime
+from sqlalchemy.sql import func, and_, exists
 
-# App imports
-from app.core import get_redirect_target
+from datetime import datetime
 
 # Module imports
 from . import excel
 from .models import CallTable, EventTable
-from .core import configure_query, run_report, parse_date_range
+from .core import configure_query, parse_date_range
+from .tasks.sla_report import run_report
 
 bp = Blueprint(
     'report',
@@ -22,11 +22,9 @@ bp = Blueprint(
 @bp.route('/report', methods=['GET', 'POST'])
 @login_required
 def index():
-    next = get_redirect_target()
     return render_template(
         'report_template.html',
         title='Data Gallery',
-        next=next,
         columns=list(CallTable.__table__.columns.keys())
     )
 
@@ -34,7 +32,6 @@ def index():
 @bp.route('/report/<string:report_type>', methods=['GET', 'POST'])
 @login_required
 def report(report_type=''):
-    next = get_redirect_target()
     output_headers = [
         'Client',
         'I/C Presented',
@@ -59,7 +56,6 @@ def report(report_type=''):
     return render_template(
         'report_template.html',
         title='{type} Report'.format(type=report_type.upper()),
-        next=next,
         columns=list(output_headers)
     )
 
@@ -69,9 +65,9 @@ def export():
     return excel.make_response_from_array([[1, 2], [3, 4]], "csv")
 
 
-@bp.route('/data', methods=['GET'])
-def data(page=1):
-    print('data ajax')
+@bp.route('/api', methods=['GET'])
+def api():
+    print('report api')
 
     # Parser section
     g.parser.add_argument('start', type=int, location='args')
@@ -79,16 +75,28 @@ def data(page=1):
     g.parser.add_argument('length', type=int, location='args')
     g.parser.add_argument('type', type=str, location='args')
     g.parser.add_argument('report_range', type=str, location='args')
+    g.parser.add_argument('download', type=bool, location='args')
     args = g.parser.parse_args()
 
     # Arguments
     start, end = parse_date_range(args['report_range'])
 
     # Execute query
-    print(start, end)
-    print('start draw records', datetime.now(), flush=True)
-    query = g.session.query(CallTable, EventTable).join(EventTable).filter(
-        CallTable.start_time >= start).filter(CallTable.end_time <= end).filter(CallTable.call_direction == 1)
+    query = g.session.query(
+        CallTable,
+        EventTable.event_type,
+        EventTable.start_time.label('event_start_time'),
+        EventTable.end_time.label('event_end_time')
+    ).join(
+        EventTable
+    ).filter(
+        and_(
+            CallTable.start_time >= start,
+            CallTable.end_time <= end,
+            CallTable.call_direction == 1
+        )
+    )
+
     print('stop draw records', datetime.now(), flush=True)
 
     if args['type'] == 'report':
@@ -108,6 +116,6 @@ def data(page=1):
     return jsonify(
         draw=args['draw'],
         recordsTotal=total,
-        recordsFiltered=args['length'],
+        recordsFiltered=total,
         data=results['data']
     )
