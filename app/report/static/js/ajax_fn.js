@@ -9,6 +9,7 @@ function buildAjaxData() {
         "columns": "",
         "order": "",
 
+        "action": sessionStorage.action,
         "report_range": $('input[name="report_range"]').val()
     };
 

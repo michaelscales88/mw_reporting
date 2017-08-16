@@ -50,8 +50,6 @@
     <!-- Datepicker, Modal and DataTable JS -->
     <script type="text/javascript">
         $(document).ready(function () {
-            let url = "{{ url_for('report.api') }}";
-
             $.getScript("{{ url_for('report.static', filename='js/modal.js') }}", function () {
                 /* Init the report_range */
                 cb(start, end);
@@ -62,21 +60,25 @@
                     "processing": true,
                     "serverSide": true,
                     "ajax": {
-                        "url": url,
+                        "url": "{{ url_for('report.api') }}",
                         "data": buildAjaxData
                     },
-                    "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
+                    "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    "iDisplayLength": {{ iDisplayLength }}
                 });
                 $('button#change_range').bind('click', function () {
                     $('#frameModal').modal('hide');
+                    sessionStorage.action = "range";
                     table.ajax.reload();
                 });
                 $('button#save_selection').bind('click', function () {
                     $('#frameModal').modal('hide');
+                    sessionStorage.action = "download";
                     table.ajax.reload();
                 });
                 $('button#run_range').bind('click', function () {
                     $('#frameModal').modal('hide');
+                    sessionStorage.action = "report";
                     table.ajax.reload();
                 });
             });

@@ -1,13 +1,10 @@
-from flask import render_template, g, Blueprint, jsonify
+from flask import render_template, g, Blueprint, jsonify, current_app
 from flask_login import login_required
-from sqlalchemy.sql import func, and_, exists
-
-from datetime import datetime
 
 # Module imports
 from . import excel
-from .models import CallTable, EventTable
-from .core import configure_query, parse_date_range
+from .models import CallTable
+from .core import get_records, configure_records
 from .tasks.sla_report import run_report
 
 bp = Blueprint(
@@ -25,7 +22,8 @@ def index():
     return render_template(
         'report_template.html',
         title='Data Gallery',
-        columns=list(CallTable.__table__.columns.keys())
+        columns=list(CallTable.__table__.columns.keys()),
+        iDisplayLength=current_app.config['ROWS_PER_PAGE']
     )
 
 
@@ -56,7 +54,8 @@ def report(report_type=''):
     return render_template(
         'report_template.html',
         title='{type} Report'.format(type=report_type.upper()),
-        columns=list(output_headers)
+        columns=list(output_headers),
+        iDisplayLength=-1
     )
 
 
@@ -73,44 +72,23 @@ def api():
     g.parser.add_argument('start', type=int, location='args')
     g.parser.add_argument('draw', type=int, location='args')
     g.parser.add_argument('length', type=int, location='args')
-    g.parser.add_argument('type', type=str, location='args')
+    g.parser.add_argument('action', type=str, location='args')
     g.parser.add_argument('report_range', type=str, location='args')
-    g.parser.add_argument('download', type=bool, location='args')
     args = g.parser.parse_args()
 
-    # Arguments
-    start, end = parse_date_range(args['report_range'])
+    # Draw records from sqlite DB
+    records = get_records(g.session, args)
 
-    # Execute query
-    query = g.session.query(
-        CallTable,
-        EventTable.event_type,
-        EventTable.start_time.label('event_start_time'),
-        EventTable.end_time.label('event_end_time')
-    ).join(
-        EventTable
-    ).filter(
-        and_(
-            CallTable.start_time >= start,
-            CallTable.end_time <= end,
-            CallTable.call_direction == 1
-        )
-    )
-
-    print('stop draw records', datetime.now(), flush=True)
-
-    if args['type'] == 'report':
-        print('running report', flush=True)
-        frame = run_report(query)
+    if args['action'] == 'report':
+        frame = run_report(records)
         total = len(frame.index)
-        frame.name = '{type} Report: {range}'.format(type=args['type'], range=args['report_range'])
-        print('finished report', flush=True)
+        frame.name = '{type} Report: {range}'.format(type=args['action'], range=args['report_range'])
     else:
         # Server-side processing properties
-        query, total = configure_query(query, CallTable, args)
-        frame = query.frame()
+        configured_records, total = configure_records(records, CallTable, args)
+        frame = configured_records.frame()
 
-    # This just runs the query and is much faster
+    # Separate data into the format Ajax expects
     results = frame.to_dict(orient='split')
 
     return jsonify(

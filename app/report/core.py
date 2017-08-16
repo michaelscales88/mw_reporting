@@ -1,12 +1,12 @@
 from sqlalchemy.inspection import inspect
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, and_
 from dateutil.parser import parse
 
 # Access app variables from module
 from flask_login import current_user
 
 # Module imports
-from .models import ClientTable, ManagerClientLink
+from .models import ClientTable, ManagerClientLink, CallTable, EventTable
 
 
 def get_count(query):
@@ -18,7 +18,28 @@ def get_count(query):
     return count
 
 
-def configure_query(
+def get_records(session, args):
+    # Arguments
+    start, end = parse_date_range(args['report_range'])
+
+    query = session.query(
+        CallTable,
+        EventTable.event_type,
+        EventTable.start_time.label('event_start_time'),
+        EventTable.end_time.label('event_end_time')
+    ).join(
+        EventTable
+    ).filter(
+        and_(
+            CallTable.start_time >= start,
+            CallTable.end_time <= end,
+            CallTable.call_direction == 1
+        )
+    )
+    return query
+
+
+def configure_records(
         query,  # Unmodified query object
         model,  # Model used in Query
         query_params,
