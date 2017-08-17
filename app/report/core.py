@@ -2,7 +2,7 @@ from sqlalchemy.inspection import inspect
 from sqlalchemy.sql import func, and_
 from dateutil.parser import parse
 
-# Access app variables from module
+# Access flask.conf variables from module
 from flask_login import current_user
 
 # Module imports

@@ -18,7 +18,7 @@ pg_session = scoped_session(sessionmaker(autocommit=False,
                                          bind=pg_engine))
 
 # MS SQL db
-# ms_engine = create_engine(app.config['MSSQL_CONNECTION'])
+# ms_engine = create_engine(flask.conf.config['MSSQL_CONNECTION'])
 # ms_session = scoped_session(sessionmaker(autocommit=False,
 #                                          autoflush=False,
 #                                          bind=ms_engine))
@@ -41,5 +41,5 @@ def init_db():
 def receive_begin(conn):
     conn.execute('SET TRANSACTION READ ONLY')
 
-# Want to create metadata during app initialization after the engine is created
+# Want to create metadata during flask.conf initialization after the engine is created
 init_db()

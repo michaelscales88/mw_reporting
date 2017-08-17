@@ -12,17 +12,16 @@ deployed = system() == 'Linux'
 app = Flask(
     __name__,
     instance_relative_config=True,
-    instance_path='/tmp/' if deployed else None,
+    instance_path='/var/www/tmp/' if deployed else None,
     static_folder='static',
     template_folder='templates'
 )
 
 
-# Get app settings
+# Get flask.conf settings
 app.config.from_object(
     'app.default_config.DevelopmentConfig'
 )
-
 
 app.config.from_yaml('clients.yml', silent=True)
 app.config.from_yaml('secret_stuff.yml', silent=True)

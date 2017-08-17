@@ -5,18 +5,18 @@ services:
     restart: always
     build:
       context: ..
-      dockerfile: ./deployment/app/Dockerfile
-    command: uwsgi --ini app.ini
+      dockerfile: ./deployment/flask/Dockerfile
+    command: uwsgi --ini uwsgi.ini
     volumes:
-      - ../app:/app/app
-      - ../database:/app/database
-      - ../instance:/tmp
+      - ../app:/var/www/app/app
+      - ../database:/var/www/app/database
+      - ../instance:/var/www/tmp
   nginx:
     restart: always
     build:
       context: ..
       dockerfile: ./deployment/nginx/Dockerfile
-    command: nginx -c /etc/nginx/nginx.conf
+    command: nginx -c nginx.conf
     volumes_from:
       - website:ro
     links:
