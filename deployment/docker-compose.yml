@@ -1,6 +1,7 @@
 version: '2'
 
 services:
+  # App
   website:
     restart: always
     build:
@@ -11,6 +12,8 @@ services:
       - ../app:/var/www/app/app
       - ../database:/var/www/app/database
       - ../instance:/var/www/tmp
+
+  # Web Server
   nginx:
     restart: always
     build:
@@ -24,3 +27,14 @@ services:
     ports:
       - "80:80"
       - "443:443"
+
+  # RabbitMQ
+  rabbit:
+    hostname: rabbit
+    image: rabbitmq:3.6.0
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=mypass
+    ports:
+      - "5672:5672"  # port for debugging
+      - "15672:15672"  # port for rabbitmq management plugin
