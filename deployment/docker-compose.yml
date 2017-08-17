@@ -28,13 +28,26 @@ services:
       - "80:80"
       - "443:443"
 
-  # RabbitMQ
+  # RabbitMQ Broker
   rabbit:
     hostname: rabbit
-    image: rabbitmq:3.6.0
+    image: rabbitmq:latest
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=mypass
     ports:
       - "5672:5672"  # port for debugging
       - "15672:15672"  # port for rabbitmq management plugin
+
+  # Celery worker
+  worker:
+    build:
+      context: ..
+      dockerfile: ./deployment/celery/Dockerfile
+    volumes_from:
+      - website:ro
+    links:
+      - website
+      - rabbit
+    depends_on:
+      - rabbit
