@@ -16,6 +16,10 @@ class Config(object):
     SQLALCHEMY_MIGRATE_REPO = path.join(PACKAGEDIR, 'database', 'db_repository')
     SQLALCHEMY_TRACK_MODIFICATIONS = False  # Turn this off to reduce overhead
 
+    # Configure task Broker/Worker
+    CELERY_BROKER_URL = 'amqp://user:password@rabbit:5672/'
+    CELERY_RESULT_BACKEND = 'rpc://'
+
     # email server
     MAIL_SERVER = 'smtp.googlemail.com'
     MAIL_PORT = 465

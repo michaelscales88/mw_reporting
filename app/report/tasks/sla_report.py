@@ -4,6 +4,13 @@ from datetime import time
 from operator import add
 from functools import reduce
 from .common import *
+from app import celery
+
+
+@celery.task()
+def taste_celery():
+    return "Working bitches"
+
 
 output_headers = [
         'I/C Presented',
@@ -92,6 +99,7 @@ row_data = [
     ]
 
 
+@celery.task()
 def run_report(query):
     print('hit run_report', flush=True)
 

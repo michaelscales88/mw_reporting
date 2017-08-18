@@ -25,3 +25,4 @@ six
 texttable
 psycopg2
 uwsgi
+celery

@@ -30,21 +30,21 @@ services:
 
   # RabbitMQ Broker
   rabbit:
-    hostname: rabbit
+    hostname: "rabbit1"
     image: rabbitmq:latest
     environment:
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=mypass
-    ports:
-      - "5672:5672"  # port for debugging
-      - "15672:15672"  # port for rabbitmq management plugin
+      RABBITMQ_DEFAULT_VHOST: "/"
+      RABBITMQ_DEFAULT_USER: "user"
+      RABBITMQ_DEFAULT_PASS: "password"
 
   # Celery worker
   worker:
     build:
       context: ..
-#      dockerfile: ./deployment/celery/Dockerfile
-#    command: celery worker -l info -A /var/www/app/...
+      dockerfile: ./deployment/celery/Dockerfile
+    hostname: "worker"
+    restart: always
+    command: celery -A app.celery worker -l info
     volumes_from:
       - website:ro
     links:

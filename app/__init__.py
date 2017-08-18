@@ -1,7 +1,8 @@
+from __future__ import absolute_import
 from flask_login import LoginManager
 from platform import system
 
-from app.util.flask_extended import Flask
+from app.util import Flask, make_celery
 
 
 # Need to make some decisions based on the file system
@@ -18,13 +19,16 @@ app = Flask(
 )
 
 
-# Get flask.conf settings
+# Get app settings
 app.config.from_object(
     'app.default_config.DevelopmentConfig'
 )
-
 app.config.from_yaml('clients.yml', silent=True)
 app.config.from_yaml('secret_stuff.yml', silent=True)
+
+
+# Init task queue
+celery = make_celery(app)
 
 
 # Configure login page

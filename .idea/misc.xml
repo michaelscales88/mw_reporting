@@ -10,4 +10,7 @@
     <other-services-enabled>true</other-services-enabled>
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.5.1 virtualenv at ~/Desktop/local/environments/flask_venv" project-jdk-type="Python SDK" />
+  <component name="PythonCompatibilityInspectionAdvertiser">
+    <option name="version" value="2" />
+  </component>
 </project>
