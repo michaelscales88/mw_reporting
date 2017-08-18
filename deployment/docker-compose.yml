@@ -43,7 +43,8 @@ services:
   worker:
     build:
       context: ..
-      dockerfile: ./deployment/celery/Dockerfile
+#      dockerfile: ./deployment/celery/Dockerfile
+#    command: celery worker -l info -A /var/www/app/...
     volumes_from:
       - website:ro
     links:
