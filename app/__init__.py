@@ -1,8 +1,7 @@
 from __future__ import absolute_import
 from flask_login import LoginManager
 from platform import system
-
-from app.util import Flask, make_celery
+from app.util import Flask, make_celery, AlchemyEncoder
 
 
 # Need to make some decisions based on the file system
@@ -17,6 +16,10 @@ app = Flask(
     static_folder='static',
     template_folder='templates'
 )
+
+
+# Set the json encoder
+app.json_encoder = AlchemyEncoder
 
 
 # Get app settings

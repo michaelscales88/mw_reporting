@@ -80,7 +80,10 @@ def api():
     records = get_records(g.session, args)
 
     if args['action'] == 'report':
-        frame = run_report(records)
+        print('calling run_report')
+        report_results = run_report.delay(records)
+        report_results.wait()
+        frame = report_results.get(timeout=1)
         total = len(frame.index)
         frame.name = '{type} Report: {range}'.format(type=args['action'], range=args['report_range'])
     else:

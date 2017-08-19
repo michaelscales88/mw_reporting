@@ -1,12 +1,9 @@
 from sqlalchemy import Column, Text, DateTime, Integer, ForeignKey, Boolean
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy_utils import generic_repr
 from app.database import Base
 
 
-@generic_repr
 class CallTable(Base):
     __searchable__ = []
 
@@ -24,9 +21,8 @@ class CallTable(Base):
     caller_id = Column(Text)
     inbound_route = Column(Text)
 
-    @declared_attr
-    def __tablename__(cls):
-        return cls.__name__.lower()
+    def __json__(self):
+        return list(self.__mapper__.columns.keys())
 
     @staticmethod
     def src_statement(request_date):
@@ -40,7 +36,6 @@ class CallTable(Base):
         return self.call_id < other.call_id
 
 
-@generic_repr
 class EventTable(Base):
     __searchable__ = []
 
@@ -59,9 +54,8 @@ class EventTable(Base):
     recording_rule = Column(Integer)
     call_id = Column(Integer, ForeignKey(CallTable.call_id))
 
-    @declared_attr
-    def __tablename__(cls):
-        return cls.__name__.lower()
+    def __json__(self):
+        return list(self.__mapper__.columns.keys())
 
     @hybrid_property
     def length(self):
@@ -75,7 +69,6 @@ class EventTable(Base):
         )
 
 
-@generic_repr
 class ClientTable(Base):
 
     id = Column(Integer, primary_key=True)
@@ -87,10 +80,6 @@ class ClientTable(Base):
         'User',
         secondary='manager_client_link'
     )
-
-    @declared_attr
-    def __tablename__(cls):
-        return cls.__name__.lower()
 
 
 class ManagerClientLink(Base):

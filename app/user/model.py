@@ -1,12 +1,9 @@
 from sqlalchemy import Column, Text, DateTime, Integer
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
-from sqlalchemy_utils import generic_repr
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.database import Base
 
 
-@generic_repr
 class User(Base):
     __searchable__ = ['alias', 'about_me']
 
@@ -25,9 +22,8 @@ class User(Base):
         secondary='manager_client_link'
     )
 
-    @declared_attr
-    def __tablename__(cls):
-        return cls.__name__.lower()
+    def __json__(self):
+        return list(self.__mapper__.columns.keys())
 
     @property
     def password(self):

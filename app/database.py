@@ -1,9 +1,9 @@
 from sqlalchemy import create_engine, event
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session
 from redpanda.orm import sessionmaker
 
 from app import app
+from .model import Base
 
 # Internal db
 db_engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
@@ -18,12 +18,11 @@ pg_session = scoped_session(sessionmaker(autocommit=False,
                                          bind=pg_engine))
 
 # MS SQL db
-# ms_engine = create_engine(flask.conf.config['MSSQL_CONNECTION'])
+# ms_engine = create_engine(app.config['MSSQL_CONNECTION'])
 # ms_session = scoped_session(sessionmaker(autocommit=False,
 #                                          autoflush=False,
 #                                          bind=ms_engine))
 
-Base = declarative_base()
 Base.query = db_session.query_property()
 
 
@@ -41,5 +40,5 @@ def init_db():
 def receive_begin(conn):
     conn.execute('SET TRANSACTION READ ONLY')
 
-# Want to create metadata during flask.conf initialization after the engine is created
+# Want to create metadata during app initialization after the engine is created
 init_db()

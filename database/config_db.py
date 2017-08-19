@@ -1,4 +1,3 @@
-from db_manager import DbManager
 from collections import OrderedDict
 
 
@@ -32,4 +31,5 @@ if __name__ == '__main__':
 
     from app import default_config
     from app.database import Base
+    from .db_manager import DbManager
     menu()

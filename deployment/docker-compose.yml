@@ -45,6 +45,9 @@ services:
     hostname: "worker"
     restart: always
     command: celery -A app.celery worker -l info
+    environment:
+      user: "user"
+      password: "password"
     volumes_from:
       - website:ro
     links:

@@ -1,16 +1,11 @@
 from flask import current_app
 from pandas import DataFrame, Series
+from app import celery
 from datetime import time
 from operator import add
 from functools import reduce
+
 from .common import *
-from app import celery
-
-
-@celery.task()
-def taste_celery():
-    return "Working bitches"
-
 
 output_headers = [
         'I/C Presented',
@@ -99,18 +94,24 @@ row_data = [
     ]
 
 
-@celery.task()
+@celery.task
 def run_report(query):
     print('hit run_report', flush=True)
 
     # Create a pyexcel table with the appropriate defaults by column name
     prepared_report = make_pyexcel_table(output_headers, list(current_app.config['CLIENTS']), default_row)
 
+    print('prepared report', flush=True)
+
     # Index the query. Group columns from EventTable (c_event) to the call from CallTable (c_call)
-    cached_results = prepare_records(query)
+    cached_results = prepare_records(query.all())
+    print('waiting cache', flush=True)
+    print('cached results', flush=True)
 
     # Consume query data
     report = process_report(prepared_report, cached_results)
+    print('process waiting', flush=True)
+    print('processed results', flush=True)
 
     for rd in row_data:
         make_programmatic_column(report, **rd)
@@ -149,16 +150,16 @@ def make_programmatic_column(report, tgt_column='', lh_values=(), rh_values=()):
     # return report
 
 
-def prepare_records(query):
+def prepare_records(record_list):
     """
     Group calls by event type on the Event Table
     Use the grouped event types to give the call properties
     E.g. Interval of 0 for event type 4 means that the call never had Talking time == Unanswered call
-    :param query: 
+    :param record_list: 
     :return: OrderedDict. Key: CallTable Values: Sum of intervals grouped by event type
     """
     cached_results = OrderedDict()
-    for call, event_type, start, end in query.all():
+    for call, event_type, start, end in record_list:
 
         cached_result = cached_results.get(call)
 
