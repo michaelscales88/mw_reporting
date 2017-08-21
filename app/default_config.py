@@ -17,8 +17,8 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False  # Keep this off to reduce overhead
 
     # Configure task Broker/Worker
-    # CELERY_BROKER_URL = 'amqp://user:password@rabbit:5672/'
-    CELERY_BROKER_URL = 'amqp://user:password@localhost:5672/'
+    CELERY_BROKER_URL = 'amqp://user:password@rabbit:5672/'
+    # CELERY_BROKER_URL = 'amqp://user:password@localhost:5672/'
     CELERY_RESULT_BACKEND = 'rpc://'
 
     # Tell celery to use your json serializer

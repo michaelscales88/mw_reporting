@@ -1,10 +1,22 @@
-from sqlalchemy.inspection import inspect
 from sqlalchemy.sql import func, and_
 from dateutil.parser import parse
 from flask_login import current_user
+from sqlalchemy.orm.base import object_mapper
+from sqlalchemy.orm.exc import UnmappedInstanceError
+from pandas import DataFrame
 
 # Module imports
+from . import excel
+from .tasks.sla_report import test
 from .models import ClientTable, ManagerClientLink, CallTable, EventTable
+
+
+def is_mapped(obj):
+    try:
+        object_mapper(obj)
+    except UnmappedInstanceError:
+        return False
+    return True
 
 
 def get_count(query):
@@ -39,21 +51,21 @@ def get_records(session, args):
 
 def configure_records(
         query,  # Unmodified query object
-        model,  # Model used in Query
         query_params,
         ascending=False
 ):
-    # Determine metadata and create mapper class
-    query_model = inspect(model)
+    # Find ORM mapper
+    for entity in query._entities:
+        print(type(entity), entity)
+        if is_mapped(entity):
+            print('inside mapper')
+            # Get PK from the mapper
+            pk = entity.primary_key[0]
 
-    # Get pk from the mapper. pk is <table>.<pk name>
-    pk = query_model.primary_key[0]  # this is a pk object
-
-    # Get total before slicing
-    total = get_count(query)
-
-    # Sort order
-    query = query.order_by(pk.asc()) if ascending else query.order_by(pk.desc())
+            # Sort order
+            query = query.order_by(pk.asc()) if ascending else query.order_by(pk.desc())
+            print('found mapper and sorted')
+            break
 
     # Offset if we are going beyond the initial ROWS_PER_PAGE
     if query_params['start'] > 0:
@@ -62,7 +74,7 @@ def configure_records(
     # Limit the number of rows to the page
     query = query.limit(query_params['length'])
 
-    return query, total
+    return query
 
 
 def grouper(item):
@@ -98,3 +110,38 @@ def delete_client(session, row_id):
         # Check if they want to proceed
         # Remove all the relationships
         # ClientTable.query.filter(ClientTable.id == row_id).delete()
+
+
+def empty_frame():
+    return DataFrame(), 0
+
+
+def show_records(records, args):
+
+    # Check total before slicing
+    total = get_count(records)
+
+    # Pagination
+    data = configure_records(records, args)
+
+    return data.frame(), total
+
+
+def run_report(records):
+    print('ran report')
+    total = 0
+    # print('calling run_report')
+    # report_results = run_report.delay(records.all())
+    # report_results.wait()
+    # frame = report_results.get(timeout=1)
+    # frame.name = '{type} Report: {range}'.format(type=args['action'], range=args['report_range'])
+    return DataFrame(), total
+
+
+def get_download():
+    test_results = test.delay(1, 5)
+    print('waiting', flush=True)
+    test_results.wait()
+    print(test_results.get(timeout=1))
+    print('printed results', flush=True)
+    return excel.make_response_from_array([[1, 2], [3, 4]], "csv")

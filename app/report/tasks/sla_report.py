@@ -95,38 +95,45 @@ row_data = [
 
 
 @celery.task
+def test(a, b):
+    return 'Success', a * b
+
+
+@celery.task
 def run_report(query):
     print('hit run_report', flush=True)
-
+    for p in query:
+        print(p, flush=True)
     # Create a pyexcel table with the appropriate defaults by column name
-    prepared_report = make_pyexcel_table(output_headers, list(current_app.config['CLIENTS']), default_row)
+    # prepared_report = make_pyexcel_table(output_headers, list(current_app.config['CLIENTS']), default_row)
 
     print('prepared report', flush=True)
 
     # Index the query. Group columns from EventTable (c_event) to the call from CallTable (c_call)
-    cached_results = prepare_records(query.all())
+    # cached_results = prepare_records(query.all())
     print('waiting cache', flush=True)
     print('cached results', flush=True)
 
     # Consume query data
-    report = process_report(prepared_report, cached_results)
+    # report = process_report(prepared_report, cached_results)
     print('process waiting', flush=True)
     print('processed results', flush=True)
 
-    for rd in row_data:
-        make_programmatic_column(report, **rd)
+    # for rd in row_data:
+    #     make_programmatic_column(report, **rd)
 
     # Stringify each cell
-    format_table(report)
+    # format_table(report)
 
     # Convert pyexcel table into dataframe
-    df = DataFrame.from_items(
-        [col for col in report.to_dict().items()]
-    )
-    index = Series(['{ext} {name}'.format(ext=client_ext, name=client_info['CLIENT_NAME'])
-                    for client_ext, client_info in current_app.config['CLIENTS'].items()] + ['Summary'])
-    df.insert(0, "Client", index)
-    return df
+    # df = DataFrame.from_items(
+    #     [col for col in report.to_dict().items()]
+    # )
+    # index = Series(['{ext} {name}'.format(ext=client_ext, name=client_info['CLIENT_NAME'])
+    #                 for client_ext, client_info in current_app.config['CLIENTS'].items()] + ['Summary'])
+    # df.insert(0, "Client", index)
+    # df = DataFrame()
+    return 'success'
 
 
 def make_programmatic_column(report, tgt_column='', lh_values=(), rh_values=()):

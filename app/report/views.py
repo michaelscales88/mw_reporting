@@ -2,10 +2,9 @@ from flask import render_template, g, Blueprint, jsonify, current_app
 from flask_login import login_required
 
 # Module imports
-from . import excel
 from .models import CallTable
-from .core import get_records, configure_records
-from .tasks.sla_report import run_report
+from .core import get_records, get_download, show_records, run_report, empty_frame
+
 
 bp = Blueprint(
     'report',
@@ -59,14 +58,8 @@ def report(report_type=''):
     )
 
 
-@bp.route('/download')
-def export():
-    return excel.make_response_from_array([[1, 2], [3, 4]], "csv")
-
-
 @bp.route('/api', methods=['GET'])
 def api():
-    print('report api')
 
     # Parser section
     g.parser.add_argument('start', type=int, location='args')
@@ -76,20 +69,19 @@ def api():
     g.parser.add_argument('report_range', type=str, location='args')
     args = g.parser.parse_args()
 
-    # Draw records from sqlite DB
+    # Draw records
     records = get_records(g.session, args)
 
+    # Action stuff
     if args['action'] == 'report':
-        print('calling run_report')
-        report_results = run_report.delay(records)
-        report_results.wait()
-        frame = report_results.get(timeout=1)
-        total = len(frame.index)
-        frame.name = '{type} Report: {range}'.format(type=args['action'], range=args['report_range'])
+        frame, total = run_report(records)
+    elif args['action'] == 'view':
+        frame, total = show_records(records, args)
     else:
-        # Server-side processing properties
-        configured_records, total = configure_records(records, CallTable, args)
-        frame = configured_records.frame()
+        frame, total = empty_frame()
+
+    if args['action'] == 'download':
+        get_download()
 
     # Separate data into the format Ajax expects
     results = frame.to_dict(orient='split')

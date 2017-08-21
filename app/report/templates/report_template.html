@@ -66,21 +66,24 @@
                     "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
                     "iDisplayLength": {{ iDisplayLength }}
                 });
-                $('button#change_range').bind('click', function () {
+
+                function page_api(event) {
                     $('#frameModal').modal('hide');
-                    sessionStorage.action = "range";
+                    sessionStorage.action = event.data.action;
                     table.ajax.reload();
-                });
-                $('button#save_selection').bind('click', function () {
-                    $('#frameModal').modal('hide');
-                    sessionStorage.action = "download";
-                    table.ajax.reload();
-                });
-                $('button#run_range').bind('click', function () {
-                    $('#frameModal').modal('hide');
-                    sessionStorage.action = "report";
-                    table.ajax.reload();
-                });
+                }
+
+                $('button#change_range').on('click', {
+                    action: "view"
+                }, page_api);
+
+                $('button#save_selection').on('click', {
+                    action: "download"
+                }, page_api);
+
+                $('button#run_range').on('click', {
+                    action: "report"
+                }, page_api);
             });
         });
     </script>
