@@ -3,7 +3,7 @@ from flask_login import login_required
 
 # Module imports
 from .models import CallTable
-from .core import get_download, show_records, run_report, empty_frame
+from .core import get_download, show_records, get_report, empty_frame
 
 bp = Blueprint(
     'report',
@@ -50,7 +50,7 @@ def api():
     # Action stuff
     if args['action'] == 'report':
         # Celery worker will draw records
-        frame, total = run_report(args)
+        frame, total = get_report(g.session, args)
     elif args['action'] == 'view':
         # Draw records
         frame, total = show_records(g.session, args)

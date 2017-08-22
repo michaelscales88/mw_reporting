@@ -66,7 +66,3 @@ class EventTable(Base):
         return """SELECT * FROM c_event WHERE to_char(c_event.start_time, 'YYYY-MM-DD') = '{date}'""".format(
             date=request_date
         )
-
-
-def SlaReport(Base):
-    __searchable__ = []

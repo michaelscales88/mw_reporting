@@ -9,7 +9,7 @@ from sqlalchemy.sql import func, and_
 from operator import add
 from functools import reduce
 
-from ..models import CallTable, EventTable
+from ..models import CallTable, EventTable, ReportCache
 
 
 class DeltaTemplate(Template):
@@ -115,6 +115,7 @@ def make_programmatic_column(report, tgt_column='', lh_values=(), rh_values=()):
     def programmed_column(cell):
         # Get the next row on subsequent calls
         tgt_row = next(rows)
+
         # Reduce avoids handling int vs timedelta addition
         numerator = reduce(add, [report[tgt_row, lh_value] for lh_value in lh_values])
         denominator = reduce(add, [report[tgt_row, rh_value] for rh_value in rh_values])
@@ -135,3 +136,25 @@ def get_count(query):
     else:
         count = 0
     return count
+
+
+def cache_report(session, start, end, report):
+    cached_report = ReportCache(
+        name=report.name,
+        report=report.dict,
+        start=start,
+        end=end
+    )
+    session.add(cached_report)
+
+
+def get_cached_report(session, report_start, report_end, report_name):
+    return session.query(
+        ReportCache
+    ).filter(
+        and_(
+            ReportCache.name == report_name,
+            ReportCache.start == report_start,
+            ReportCache.end == report_end
+        )
+    ).first()

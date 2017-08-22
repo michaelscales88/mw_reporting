@@ -49,7 +49,7 @@ services:
       user: "user"
       password: "password"
     volumes_from:
-      - website:ro
+      - website
     links:
       - website
       - rabbit

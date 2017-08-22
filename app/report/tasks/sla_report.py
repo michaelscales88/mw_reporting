@@ -9,7 +9,6 @@ from .common import *
 
 @celery.task
 def report_task(start, end):
-    print('hit run_report', flush=True)
 
     # Create a pyexcel table with the appropriate defaults by column name
     prepared_report = make_pyexcel_table(
@@ -28,18 +27,22 @@ def report_task(start, end):
 
         # Consume query data
         report = process_report(prepared_report, cached_results)
+        report.name = 'sla_report'
 
         for rd in current_app.config['sla_row_data']:
             make_programmatic_column(report, **rd)
+
+        # Stringify each cell
+        format_table(report)
+
+        cache_report(db_session, start, end, report)
+
     except Exception as e:
         print(e)
         db_session.rollback()
     else:
-        # Stringify each cell
-        format_table(report)
-
-        # Cache the report
-
+        db_session.commit()
+        # Set success flag on commit
         success = True
     finally:
         db_session.remove()

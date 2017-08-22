@@ -1,6 +1,13 @@
 from sqlalchemy.ext.declarative import DeclarativeMeta
+from datetime import datetime
+from dateutil import parser
 from flask import json
 from kombu.serialization import register
+
+
+CONVERTERS = {
+    '__datetime__': parser.parse
+}
 
 
 class AlchemyEncoder(json.JSONEncoder):
@@ -17,15 +24,21 @@ class AlchemyEncoder(json.JSONEncoder):
                 except TypeError:
                     data[field] = None
             return data
+        if isinstance(o, datetime):
+            return {"val": o.isoformat(), "_spec_type": "__datetime__"}
         return json.JSONEncoder.default(self, o)
 
 
-def decoder(obj):
-    if '__type__' in obj:
-        pass
-        # if obj['__type__'] == '__datetime__':
-        #     return obj
-    return obj
+def object_hook(obj):
+    """Convert json data from its serialized value"""
+    _spec_type = obj.get('_spec_type')
+    if not _spec_type:
+        return obj
+
+    if _spec_type in CONVERTERS:
+        return CONVERTERS[_spec_type](obj['val'])
+    else:
+        raise Exception('Unknown {}'.format(_spec_type))
 
 
 # Encoder function
@@ -35,7 +48,7 @@ def my_dumps(obj):
 
 # Decoder function
 def my_loads(obj):
-    return json.loads(obj, object_hook=decoder)
+    return json.loads(obj, object_hook=object_hook)
 
 
 # Set the JSON encoder for Celery
