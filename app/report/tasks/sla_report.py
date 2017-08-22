@@ -1,160 +1,50 @@
 from flask import current_app
-from pandas import DataFrame, Series
-from app import celery
 from datetime import time
-from operator import add
-from functools import reduce
+
+from app import celery
+from app.database import db_session
 
 from .common import *
 
-output_headers = [
-        'I/C Presented',
-        'I/C Live Answered',
-        'I/C Abandoned',
-        'Voice Mails',
-        'Incoming Live Answered (%)',
-        'Incoming Received (%)',
-        'Incoming Abandoned (%)',
-        'Average Incoming Duration',
-        'Average Wait Answered',
-        'Average Wait Lost',
-        'Calls Ans Within 15',
-        'Calls Ans Within 30',
-        'Calls Ans Within 45',
-        'Calls Ans Within 60',
-        'Calls Ans Within 999',
-        'Call Ans + 999',
-        'Longest Waiting Answered',
-        'PCA'
-    ]
-
-default_row = [
-        0,  # 'I/C Presented'
-        0,  # 'I/C Live Answered'
-        0,  # 'I/C Abandoned'
-        0,  # 'Voice Mails'
-        1.0,  # 'Incoming Live Answered (%)',
-        1.0,  # 'Incoming Received (%)',
-        0.0,  # 'Incoming Abandoned (%)'
-        timedelta(0),  # 'Average Incoming Duration'
-        timedelta(0),  # 'Average Wait Answered'
-        timedelta(0),  # 'Average Wait Lost'
-        0,  # 'Calls Ans Within 15'
-        0,  # 'Calls Ans Within 30'
-        0,  # 'Calls Ans Within 45'
-        0,  # 'Calls Ans Within 60'
-        0,  # 'Calls Ans Within 999'
-        0,  # 'Call Ans + 999'
-        timedelta(0),  # 'Longest Waiting Answered'
-        1.0  # 'PCA'
-    ]
-
-row_data = [
-        {
-            'tgt_column': 'Incoming Live Answered (%)',
-            'lh_values': ('I/C Live Answered',),
-            'rh_values': ('I/C Presented',)
-
-        },
-        {
-            'tgt_column': 'Incoming Received (%)',
-            'lh_values': ('I/C Live Answered', 'Voice Mails',),
-            'rh_values': ('I/C Presented',)
-
-        },
-        {
-            'tgt_column': 'Incoming Abandoned (%)',
-            'lh_values': ('I/C Abandoned',),
-            'rh_values': ('I/C Presented',)
-
-        },
-        {
-            'tgt_column': 'Average Incoming Duration',
-            'lh_values': ('Average Incoming Duration',),
-            'rh_values': ('I/C Live Answered',)
-
-        },
-        {
-            'tgt_column': 'Average Wait Answered',
-            'lh_values': ('Average Wait Answered',),
-            'rh_values': ('I/C Live Answered',)
-
-        },
-        {
-            'tgt_column': 'Average Wait Lost',
-            'lh_values': ('Average Wait Lost',),
-            'rh_values': ('I/C Abandoned',)
-
-        },
-        {
-            'tgt_column': 'PCA',
-            'lh_values': ('Calls Ans Within 15', 'Calls Ans Within 30',),
-            'rh_values': ('I/C Presented',)
-        }
-    ]
-
 
 @celery.task
-def test(a, b):
-    return 'Success', a * b
-
-
-@celery.task
-def run_report(query):
+def report_task(start, end):
     print('hit run_report', flush=True)
-    for p in query:
-        print(p, flush=True)
+
     # Create a pyexcel table with the appropriate defaults by column name
-    # prepared_report = make_pyexcel_table(output_headers, list(current_app.config['CLIENTS']), default_row)
+    prepared_report = make_pyexcel_table(
+        current_app.config['sla_report_headers'],
+        list(current_app.config['CLIENTS']),
+        current_app.config['sla_default_row']
+    )
 
-    print('prepared report', flush=True)
+    success = False
+    try:
+        record_query = get_records(db_session, start, end)
+        record_list = record_query.all()
 
-    # Index the query. Group columns from EventTable (c_event) to the call from CallTable (c_call)
-    # cached_results = prepare_records(query.all())
-    print('waiting cache', flush=True)
-    print('cached results', flush=True)
+        # Index the query. Group columns from EventTable (c_event) to the call from CallTable (c_call)
+        cached_results = prepare_records(record_list)
 
-    # Consume query data
-    # report = process_report(prepared_report, cached_results)
-    print('process waiting', flush=True)
-    print('processed results', flush=True)
+        # Consume query data
+        report = process_report(prepared_report, cached_results)
 
-    # for rd in row_data:
-    #     make_programmatic_column(report, **rd)
+        for rd in current_app.config['sla_row_data']:
+            make_programmatic_column(report, **rd)
+    except Exception as e:
+        print(e)
+        db_session.rollback()
+    else:
+        # Stringify each cell
+        format_table(report)
 
-    # Stringify each cell
-    # format_table(report)
+        # Cache the report
 
-    # Convert pyexcel table into dataframe
-    # df = DataFrame.from_items(
-    #     [col for col in report.to_dict().items()]
-    # )
-    # index = Series(['{ext} {name}'.format(ext=client_ext, name=client_info['CLIENT_NAME'])
-    #                 for client_ext, client_info in current_app.config['CLIENTS'].items()] + ['Summary'])
-    # df.insert(0, "Client", index)
-    # df = DataFrame()
-    return 'success'
+        success = True
+    finally:
+        db_session.remove()
 
-
-def make_programmatic_column(report, tgt_column='', lh_values=(), rh_values=()):
-    # Iterators can use next
-    rows = iter(report.rownames)
-
-    def programmed_column(cell):
-        # Get the next row on subsequent calls
-        tgt_row = next(rows)
-        # Reduce avoids handling int vs timedelta addition
-        numerator = reduce(add, [report[tgt_row, lh_value] for lh_value in lh_values])
-        denominator = reduce(add, [report[tgt_row, rh_value] for rh_value in rh_values])
-        try:
-            cell = numerator / denominator
-        except ZeroDivisionError:
-            pass
-
-        return cell
-
-    report.column.format(tgt_column, programmed_column)
-    # return report
+    return success
 
 
 def prepare_records(record_list):

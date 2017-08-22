@@ -1,7 +1,15 @@
+from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.inspection import inspect
 from string import Template
 from datetime import timedelta
 from collections import OrderedDict
 from pyexcel import Sheet
+from dateutil.parser import parse
+from sqlalchemy.sql import func, and_
+from operator import add
+from functools import reduce
+
+from ..models import CallTable, EventTable
 
 
 class DeltaTemplate(Template):
@@ -48,6 +56,11 @@ def format_table(table):
     return table
 
 
+def parse_date_range(date_range):
+    start, end = date_range.split(' - ')
+    return parse(start), parse(end)
+
+
 def make_pyexcel_table(headers, row_names, default_row, with_summary=False):
 
     report_construct = Sheet(
@@ -67,3 +80,58 @@ def make_pyexcel_table(headers, row_names, default_row, with_summary=False):
         report_construct.extend_rows(additional_row)
 
     return report_construct
+
+
+def get_mapped_class(obj):
+    for o in obj:
+        if isinstance(o.__class__, DeclarativeMeta):
+            # Mapped class has meta data and fn
+            return inspect(o)
+    else:
+        return False
+
+
+def get_records(session, start, end):
+    return session.query(
+        CallTable,
+        EventTable.event_type,
+        EventTable.start_time.label('event_start_time'),
+        EventTable.end_time.label('event_end_time')
+    ).join(
+        EventTable
+    ).filter(
+        and_(
+            CallTable.start_time >= start,
+            CallTable.end_time <= end,
+            CallTable.call_direction == 1
+        )
+    )
+
+
+def make_programmatic_column(report, tgt_column='', lh_values=(), rh_values=()):
+    # Iterators can use next
+    rows = iter(report.rownames)
+
+    def programmed_column(cell):
+        # Get the next row on subsequent calls
+        tgt_row = next(rows)
+        # Reduce avoids handling int vs timedelta addition
+        numerator = reduce(add, [report[tgt_row, lh_value] for lh_value in lh_values])
+        denominator = reduce(add, [report[tgt_row, rh_value] for rh_value in rh_values])
+        try:
+            cell = numerator / denominator
+        except ZeroDivisionError:
+            pass
+
+        return cell
+
+    report.column.format(tgt_column, programmed_column)
+
+
+def get_count(query):
+    if query:
+        count_q = query.statement.with_only_columns([func.count()]).order_by(None)
+        count = query.session.execute(count_q).scalar()
+    else:
+        count = 0
+    return count

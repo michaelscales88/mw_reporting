@@ -1,9 +1,8 @@
 from flask import render_template, flash, redirect, url_for, request, g, Blueprint
 from flask_login import login_user, logout_user, login_required
 
-from .core import new_user, existing_user
+from .core import new_user, existing_user, add_client, remove_client, delete_client
 from app.core import get_redirect_target
-from app.report.core import add_client, remove_client, delete_client
 
 
 bp = Blueprint('user', __name__, template_folder='templates', static_folder='static', static_url_path='/user/static')

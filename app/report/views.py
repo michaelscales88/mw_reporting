@@ -3,8 +3,7 @@ from flask_login import login_required
 
 # Module imports
 from .models import CallTable
-from .core import get_records, get_download, show_records, run_report, empty_frame
-
+from .core import get_download, show_records, run_report, empty_frame
 
 bp = Blueprint(
     'report',
@@ -29,31 +28,10 @@ def index():
 @bp.route('/report/<string:report_type>', methods=['GET', 'POST'])
 @login_required
 def report(report_type=''):
-    output_headers = [
-        'Client',
-        'I/C Presented',
-        'I/C Live Answered',
-        'I/C Abandoned',
-        'Voice Mails',
-        'Incoming Live Answered (%)',
-        'Incoming Received (%)',
-        'Incoming Abandoned (%)',
-        'Average Incoming Duration',
-        'Average Wait Answered',
-        'Average Wait Lost',
-        'Calls Ans Within 15',
-        'Calls Ans Within 30',
-        'Calls Ans Within 45',
-        'Calls Ans Within 60',
-        'Calls Ans Within 999',
-        'Call Ans + 999',
-        'Longest Waiting Answered',
-        'PCA'
-    ]
     return render_template(
         'report_template.html',
         title='{type} Report'.format(type=report_type.upper()),
-        columns=list(output_headers),
+        columns=['Client'] + current_app.config['sla_report_headers'],
         iDisplayLength=-1
     )
 
@@ -69,14 +47,13 @@ def api():
     g.parser.add_argument('report_range', type=str, location='args')
     args = g.parser.parse_args()
 
-    # Draw records
-    records = get_records(g.session, args)
-
     # Action stuff
     if args['action'] == 'report':
-        frame, total = run_report(records)
+        # Celery worker will draw records
+        frame, total = run_report(args)
     elif args['action'] == 'view':
-        frame, total = show_records(records, args)
+        # Draw records
+        frame, total = show_records(g.session, args)
     else:
         frame, total = empty_frame()
 

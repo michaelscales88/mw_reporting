@@ -1,6 +1,5 @@
-from sqlalchemy import Column, Text, DateTime, Integer, ForeignKey, Boolean
+from sqlalchemy import Column, Text, DateTime, Integer, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship, backref
 from app.database import Base
 
 
@@ -69,22 +68,5 @@ class EventTable(Base):
         )
 
 
-class ClientTable(Base):
-
-    id = Column(Integer, primary_key=True)
-    client_id = Column(Integer, unique=True, nullable=False)
-    client_name = Column(Integer, unique=True, nullable=False)
-    full_service = Column(Boolean, default=False)
-
-    users = relationship(
-        'User',
-        secondary='manager_client_link'
-    )
-
-
-class ManagerClientLink(Base):
-    __tablename__ = 'manager_client_link'
-    manager_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
-    client_id = Column(Integer, ForeignKey('clienttable.client_id'), primary_key=True)
-    client = relationship(ClientTable, backref=backref("clienttable_assoc"))
-    user = relationship('User', backref=backref("user_assoc"))
+def SlaReport(Base):
+    __searchable__ = []

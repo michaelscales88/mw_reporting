@@ -6,7 +6,6 @@ from kombu.serialization import register
 class AlchemyEncoder(json.JSONEncoder):
 
     def default(self, o):
-        print('inside AlchemyEncoder')
         if isinstance(o.__class__, DeclarativeMeta):
             data = {}
             fields = o.__json__() if hasattr(o, '__json__') else dir(o)
@@ -22,22 +21,20 @@ class AlchemyEncoder(json.JSONEncoder):
 
 
 def decoder(obj):
-    print('decoder', flush=True)
-    print(obj, flush=True)
+    if '__type__' in obj:
+        pass
+        # if obj['__type__'] == '__datetime__':
+        #     return obj
     return obj
 
 
 # Encoder function
 def my_dumps(obj):
-    print('hitting dumps', flush=True)
-    print(obj, flush=True)
     return json.dumps(obj, cls=AlchemyEncoder)
 
 
 # Decoder function
 def my_loads(obj):
-    print('hitting loads', flush=True)
-    print(obj, flush=True)
     return json.loads(obj, object_hook=decoder)
 
 

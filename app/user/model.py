@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Text, DateTime, Integer
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Text, DateTime, Integer, ForeignKey, Boolean
 from werkzeug.security import check_password_hash, generate_password_hash
+from sqlalchemy.orm import relationship, backref
+
 from app.database import Base
 
 
@@ -83,3 +84,24 @@ class User(Base):
     @staticmethod
     def tracked(obj, collection):
         return obj in collection
+
+
+class ClientTable(Base):
+
+    id = Column(Integer, primary_key=True)
+    client_id = Column(Integer, unique=True, nullable=False)
+    client_name = Column(Integer, unique=True, nullable=False)
+    full_service = Column(Boolean, default=False)
+
+    users = relationship(
+        'User',
+        secondary='manager_client_link'
+    )
+
+
+class ManagerClientLink(Base):
+    __tablename__ = 'manager_client_link'
+    manager_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
+    client_id = Column(Integer, ForeignKey('clienttable.client_id'), primary_key=True)
+    client = relationship(ClientTable, backref=backref("clienttable_assoc"))
+    user = relationship('User', backref=backref("user_assoc"))
