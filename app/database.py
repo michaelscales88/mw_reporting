@@ -32,7 +32,7 @@ def init_db():
     # Import models to include in the Base
 
     from app.user import User
-    from app.report import EventTable, CallTable
+    from app.report import EventTable, CallTable, ReportCache
 
     Base.metadata.create_all(bind=db_engine)
 

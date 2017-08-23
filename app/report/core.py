@@ -54,7 +54,6 @@ def show_records(session, args):
 
 
 def get_report(session, args):
-    print('starting task dispatch')
 
     # Arguments
     start, end = parse_date_range(args['report_range'])

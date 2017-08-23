@@ -15,7 +15,6 @@ app = Flask(
     instance_path='/var/www/tmp/' if deployed else None,
     template_folder='templates',
     static_folder='static',
-    # static_url_path='/var/www/app/app/static' if deployed else None
     static_url_path='/static'
 )
 

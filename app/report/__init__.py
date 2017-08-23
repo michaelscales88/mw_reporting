@@ -2,12 +2,13 @@ import flask_excel as excel
 from datetime import timedelta
 
 from . import views as report_view
-from .models import CallTable, EventTable
+from .models import CallTable, EventTable, ReportCache
 from app import app
 
 # Make excel responses
 excel.init_excel(app)
 
+# TODO remove this and integrate programmatically
 # Update app settings with report settings
 output_headers = [
     'I/C Presented',
