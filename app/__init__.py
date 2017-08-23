@@ -29,10 +29,9 @@ app.config.from_object(
 ) if deployed else app.config.from_object(
     'app.default_config.DevelopmentConfig'
 )
-
+app.config.from_object('app.celeryconfig.Config')
 app.config.from_yaml('clients.yml', silent=True)
 app.config.from_yaml('secret_stuff.yml', silent=True)
-
 
 # Init task queue
 celery = make_celery(app)

@@ -8,6 +8,8 @@ services:
       context: ..
       dockerfile: ./deployment/flask/Dockerfile
     command: uwsgi --ini uwsgi.ini
+    env_file:
+      - ./flask.env
     volumes:
       - ../app:/var/www/app/app
       - ../database:/var/www/app/database
@@ -30,24 +32,19 @@ services:
 
   # RabbitMQ Broker
   rabbit:
-    hostname: "rabbit1"
     image: rabbitmq:latest
-    environment:
-      RABBITMQ_DEFAULT_VHOST: "/"
-      RABBITMQ_DEFAULT_USER: "user"
-      RABBITMQ_DEFAULT_PASS: "password"
+    env_file:
+      - ./flask.env
 
   # Celery worker
   worker:
     build:
       context: ..
       dockerfile: ./deployment/celery/Dockerfile
-    hostname: "worker"
     restart: always
     command: celery -A app.celery worker -l info
-    environment:
-      user: "user"
-      password: "password"
+    env_file:
+      - ./flask.env
     volumes_from:
       - website
     links:
