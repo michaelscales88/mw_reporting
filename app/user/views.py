@@ -5,7 +5,13 @@ from .core import new_user, existing_user, add_client, remove_client, delete_cli
 from app.core import get_redirect_target
 
 
-bp = Blueprint('user', __name__, template_folder='templates', static_folder='static', static_url_path='/user/static')
+bp = Blueprint(
+    'user',
+    __name__,
+    template_folder='templates',
+    static_folder='static',
+    static_url_path='/user/static'
+)
 
 
 @bp.route('/settings', methods=['GET', 'POST'])

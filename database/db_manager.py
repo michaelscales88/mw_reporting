@@ -22,7 +22,7 @@ class DbManager(object):
     def config(self):
         return self._d
 
-    def from_object(self, obj):
+    def config_from_object(self, obj):
         """Updates the values from the given object.  An object can be of one
         of the following two types:
 
@@ -83,7 +83,8 @@ class DbManager(object):
 
     def downgrade(self):
         """
-        This script will downgrade the database one revision. You can run it multiple times to downgrade several revisions.
+        This script will downgrade the database one revision. 
+        You can run it multiple times to downgrade several revisions.
         """
         v = api.db_version(
             self.config['SQLALCHEMY_DATABASE_URI'],

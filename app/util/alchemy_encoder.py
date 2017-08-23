@@ -13,6 +13,7 @@ CONVERTERS = {
 class AlchemyEncoder(json.JSONEncoder):
 
     def default(self, o):
+        # ORM models
         if isinstance(o.__class__, DeclarativeMeta):
             data = {}
             fields = o.__json__() if hasattr(o, '__json__') else dir(o)
@@ -24,6 +25,7 @@ class AlchemyEncoder(json.JSONEncoder):
                 except TypeError:
                     data[field] = None
             return data
+        # Datetime
         if isinstance(o, datetime):
             return {"val": o.isoformat(), "_spec_type": "__datetime__"}
         return json.JSONEncoder.default(self, o)

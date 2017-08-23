@@ -23,6 +23,7 @@ pg_session = scoped_session(sessionmaker(autocommit=False,
 #                                          autoflush=False,
 #                                          bind=ms_engine))
 
+# Bind session to the ORM model query method
 Base.query = db_session.query_property()
 
 

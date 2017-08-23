@@ -13,8 +13,10 @@ app = Flask(
     __name__,
     instance_relative_config=True,
     instance_path='/var/www/tmp/' if deployed else None,
+    template_folder='templates',
     static_folder='static',
-    template_folder='templates'
+    # static_url_path='/var/www/app/app/static' if deployed else None
+    static_url_path='/static'
 )
 
 
@@ -24,8 +26,11 @@ app.json_encoder = AlchemyEncoder
 
 # Get app settings
 app.config.from_object(
+    'app.default_config.ProductionConfig'
+) if deployed else app.config.from_object(
     'app.default_config.DevelopmentConfig'
 )
+
 app.config.from_yaml('clients.yml', silent=True)
 app.config.from_yaml('secret_stuff.yml', silent=True)
 

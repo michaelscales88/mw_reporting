@@ -9,6 +9,7 @@ from .common import *
 
 @celery.task
 def report_task(start, end):
+    success = False
 
     # Create a pyexcel table with the appropriate defaults by column name
     prepared_report = make_pyexcel_table(
@@ -17,7 +18,6 @@ def report_task(start, end):
         current_app.config['sla_default_row']
     )
 
-    success = False
     try:
         record_query = get_records(db_session, start, end)
         record_list = record_query.all()

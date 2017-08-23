@@ -18,10 +18,9 @@ class Config(object):
 
     # Configure task Broker/Worker
     CELERY_BROKER_URL = 'amqp://user:password@rabbit:5672/'
-    # CELERY_BROKER_URL = 'amqp://user:password@localhost:5672/'
     CELERY_RESULT_BACKEND = 'rpc://'
 
-    # Tell celery to use your json serializer
+    # Tell celery to use custom serializer
     CELERY_ACCEPT_CONTENT = ['myjson']
     CELERY_TASK_SERIALIZER = 'myjson'
     CELERY_RESULT_SERIALIZER = 'myjson'
@@ -37,14 +36,13 @@ class Config(object):
     # administrator list
     ADMINS = ['your-gmail-username@gmail.com']
 
-    THREAD_LIMIT = 8
-
 
 class ProductionConfig(Config):
-    pass
+    CELERY_BROKER_URL = 'amqp://user:password@rabbit:5672/'
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_TRACK_MODIFICATIONS = True  # Turn this off to reduce overhead
+    CELERY_BROKER_URL = 'amqp://user:password@localhost:5672/'

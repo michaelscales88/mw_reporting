@@ -138,6 +138,18 @@ def get_count(query):
     return count
 
 
+def report_exists(session, start, end, report):
+    return session.query(
+        ReportCache.id
+    ).filter(
+        and_(
+            ReportCache.name == report,
+            ReportCache.start == start,
+            ReportCache.end == end
+        )
+    ).scalar() is None
+
+
 def cache_report(session, start, end, report):
     cached_report = ReportCache(
         name=report.name,

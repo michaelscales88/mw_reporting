@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 def menu():
     manager = DbManager()
-    manager.from_object(default_config.Config)
+    manager.config_from_object(default_config.Config)
     manager.base = Base
     commands = OrderedDict(
         [
