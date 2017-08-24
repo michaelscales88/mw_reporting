@@ -6,53 +6,74 @@ from app.database import db_session, pg_session
 from .common import *
 from ..models import CallTable, EventTable
 
+FETCH = {
+    'c_call': {
+        'statement': CallTable.call_id,
+        'table': CallTable
+    },
+    'c_event': {
+        'statement': EventTable.event_id,
+        'table': EventTable
+    },
+}
+
 
 @celery.task
-def get_call_table():
-    print('collecting call table rows')
-    print(current_app.config['recent_id_query'].format(row_value='call_id', select_table='c_call'))
-    sql_result = pg_session.execute(
-        current_app.config['recent_id_query'].format(row_value='call_id', select_table='c_call')
-    )
-    current_call = results_to_dict(sql_result)
-    print(current_call, type(current_call), len(current_call))
-    internal_result = db_session.query(CallTable.call_id).order_by(CallTable.call_id.desc()).limit(1)
-    # print(internal_result, type(internal_result[0]))
-    last_call = results_to_dict(internal_result)
-    print(last_call)
+def fetch_src_records(row, table):
+    """
+    Master: Src table (elsewhere.db)
+    Slave: Destination table (app.db)
+    """
+    try:
+        master_result = pg_session.execute(
+            current_app.config['recent_id_query'].format(
+                row_value=row, select_table=table
+            )
+        )
+        slave_result = db_session.query(
+            FETCH[table]['statement']
+        ).order_by(
+            FETCH[table]['statement'].desc()
+        ).limit(1)
 
-    db_session.remove()
-    pg_session.remove()
-    # print('entering get_records')
-    # if call_model and event_model:
-    #     # Get records by date
-    #     call_statement = call_model.src_statement(get_date)
-    #     event_statement = event_model.src_statement(get_date)
-    #
-    #     # Get records for the CallTable
-    #     call_data_ptr = pg_session.execute(call_statement)
-    #     call_data_records = results_to_dict(call_data_ptr)  # Returns list of dicts
-    #
-    #     # Get records for the EventTable
-    #     event_data_ptr = pg_session.execute(event_statement)
-    #     event_data_records = results_to_dict(event_data_ptr)  # Returns list of dicts
-    #
-    #     # Convert event: records -> event model -> event
-    #     event_data = [event_model(**event_record) for event_record in event_data_records]
-    #
-    #     for foreign_record in call_data_records:
-    #         call = call_model(**foreign_record)
-    #
-    #         # this sucks right now
-    #         for call_event in [call_event for call_event in event_data
-    #                            if call_event.call_id == call.call_id]:
-    #             call.add_event(call_event)
-    #
-    #         # Add foreign records to current session
-    #         db_session.add(call)
-    #     print('committing')
-    #     try:
-    #         db_session.commit()
-    #     except IntegrityError:
-    #         print('Records exist.')
-    #
+        slave_call = results_to_dict(slave_result)
+        master_call = results_to_dict(master_result)
+
+        master_call_id = master_call[0][row]
+        slave_call_id = slave_call[0][row]
+        difference = master_call_id - slave_call_id
+        # If the difference is 0 -> no work to do
+        if not difference:
+            return 'success'
+        # print(master_call_id, slave_call_id, difference)
+
+        # Don't want to kill the production server
+        if difference < 15000:
+            query = current_app.config['get_rows_query'].format(
+                row_value=row, select_table=table, start_id=slave_call_id, end_id=master_call_id
+            )
+        else:
+            print('Truncating run', table)
+            query = current_app.config['get_rows_query'].format(
+                row_value=row, select_table=table, start_id=slave_call_id, end_id=slave_call_id + 15000
+            )
+        print(query)
+        master_results = pg_session.execute(
+            query
+        )
+
+        all_results = results_to_dict(master_results)
+        # print(all_results)
+    except Exception as e:
+        print('bailed', e)
+        db_session.rollback()
+    else:
+        commit_size = len(all_results)
+        for result in all_results:
+            db_session.add(FETCH[table]['table'](**result))
+        db_session.commit()
+        return 'Added {} records to {}.'.format(commit_size, table)
+    finally:
+        db_session.remove()
+        pg_session.remove()
+        print('still did the finally part')

@@ -8,7 +8,7 @@ from .tasks.sla_report import (
     get_mapped_class, get_records, get_cached_report,
     report_exists
 )
-from .tasks.fetch import get_call_table
+from .tasks.fetch import fetch_src_records
 
 
 def server_side_processing(
@@ -100,4 +100,7 @@ def get_download():
 
 
 def test_record_getter():
-    get_call_table.delay()
+    first_result = fetch_src_records.delay('call_id', 'c_call')
+    second_result = fetch_src_records.delay('event_id', 'c_event')
+    print(first_result, second_result)
+

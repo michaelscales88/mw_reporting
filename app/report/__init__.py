@@ -104,18 +104,11 @@ ORDER BY {row_value} DESC
 LIMIT 1;
 """
 
-# event_table_string = """
-# SELECT event_id
-# FROM c_event
-# ORDER BY event_id DESC
-# LIMIT 1;
-# """
-
 get_rows_query = """
 SELECT *
 FROM {select_table}
 WHERE {row_value} > {start_id} AND
-      {row_value} < {end_id}
+      {row_value} <= {end_id}
 ORDER BY {row_value} DESC
 """
 

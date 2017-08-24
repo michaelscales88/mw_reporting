@@ -12,7 +12,8 @@ function buildAjaxData() {
         "action": sessionStorage.action,
         "report_range": $('input[name="report_range"]').val()
     };
-
+    console.log('Ajax page');
+    console.log(sessionStorage.action);
     //building the columns
     let col = []; // array
 

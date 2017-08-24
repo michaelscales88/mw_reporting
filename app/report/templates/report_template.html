@@ -56,6 +56,9 @@
             });
 
             $.getScript("{{ url_for('report.static', filename='js/ajax_fn.js') }}", function () {
+                /* Super hack */
+                sessionStorage.action = '{{ page }}';
+
                 let table = $('#displayTable').DataTable({
                     "processing": true,
                     "serverSide": true,
@@ -66,7 +69,6 @@
                     "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
                     "iDisplayLength": {{ iDisplayLength }}
                 });
-
                 function page_api(event) {
                     $('#frameModal').modal('hide');
                     sessionStorage.action = event.data.action;

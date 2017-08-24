@@ -1,4 +1,4 @@
-from flask import render_template, g, Blueprint, jsonify, current_app
+from flask import render_template, g, Blueprint, jsonify, current_app, redirect, url_for
 from flask_login import login_required
 
 # Module imports
@@ -14,26 +14,34 @@ bp = Blueprint(
 )
 
 
-@bp.route('/report', methods=['GET', 'POST'])
+@bp.route('/fill', methods=['GET'])
+def fill():
+    test_record_getter()
+    return redirect(url_for('.index'))
+
+
+@bp.route('/view', methods=['GET', 'POST'])
 @login_required
 def index():
-    test_record_getter()
     return render_template(
         'report_template.html',
         title='Data Gallery',
         columns=list(CallTable.__table__.columns.keys()),
-        iDisplayLength=current_app.config['ROWS_PER_PAGE']
+        iDisplayLength=current_app.config['ROWS_PER_PAGE'],
+        page='view'
     )
 
 
+@bp.route('/report', methods=['GET'])
 @bp.route('/report/<string:report_type>', methods=['GET', 'POST'])
 @login_required
-def report(report_type=''):
+def report(report_type='SLA'):
     return render_template(
         'report_template.html',
         title='{type} Report'.format(type=report_type.upper()),
         columns=['Client'] + current_app.config['sla_report_headers'],
-        iDisplayLength=-1
+        iDisplayLength=-1,
+        page='report'
     )
 
 
@@ -51,9 +59,11 @@ def api():
     # Action stuff
     if args['action'] == 'report':
         # Celery worker will draw records
+        print('getting report')
         frame, total = get_report(g.session, args)
     elif args['action'] == 'view':
         # Draw records
+        print('getting records')
         frame, total = show_records(g.session, args)
     else:
         frame, total = empty_frame()

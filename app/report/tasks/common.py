@@ -154,7 +154,7 @@ def report_exists(session, start, end, report):
             ReportCache.start == start,
             ReportCache.end == end
         )
-    ).scalar() is None
+    ).scalar() is not None
 
 
 def cache_report(session, start, end, report):
