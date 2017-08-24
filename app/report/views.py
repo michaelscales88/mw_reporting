@@ -3,7 +3,7 @@ from flask_login import login_required
 
 # Module imports
 from .models import CallTable
-from .core import get_download, show_records, get_report, empty_frame
+from .core import get_download, show_records, get_report, empty_frame, test_record_getter
 
 bp = Blueprint(
     'report',
@@ -17,6 +17,7 @@ bp = Blueprint(
 @bp.route('/report', methods=['GET', 'POST'])
 @login_required
 def index():
+    test_record_getter()
     return render_template(
         'report_template.html',
         title='Data Gallery',

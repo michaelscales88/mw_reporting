@@ -96,8 +96,33 @@ row_data = [
     }
 ]
 
+# Need to know the most recent row id
+recent_id_query = """
+SELECT {row_value}
+FROM {select_table}
+ORDER BY {row_value} DESC
+LIMIT 1;
+"""
+
+# event_table_string = """
+# SELECT event_id
+# FROM c_event
+# ORDER BY event_id DESC
+# LIMIT 1;
+# """
+
+get_rows_query = """
+SELECT *
+FROM {select_table}
+WHERE {row_value} > {start_id} AND
+      {row_value} < {end_id}
+ORDER BY {row_value} DESC
+"""
+
 app.config.update(
     sla_report_headers=output_headers,
     sla_default_row=default_row,
-    sla_row_data=row_data
+    sla_row_data=row_data,
+    recent_id_query=recent_id_query,
+    get_rows_query=get_rows_query
 )

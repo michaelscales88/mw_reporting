@@ -1,10 +1,28 @@
+from flask import current_app
+
 from app import celery
 from app.database import db_session, pg_session
 
+from .common import *
+from ..models import CallTable, EventTable
+
 
 @celery.task
-def get_records(a, b):
-    print('success', a * b)
+def get_call_table():
+    print('collecting call table rows')
+    print(current_app.config['recent_id_query'].format(row_value='call_id', select_table='c_call'))
+    sql_result = pg_session.execute(
+        current_app.config['recent_id_query'].format(row_value='call_id', select_table='c_call')
+    )
+    current_call = results_to_dict(sql_result)
+    print(current_call, type(current_call), len(current_call))
+    internal_result = db_session.query(CallTable.call_id).order_by(CallTable.call_id.desc()).limit(1)
+    # print(internal_result, type(internal_result[0]))
+    last_call = results_to_dict(internal_result)
+    print(last_call)
+
+    db_session.remove()
+    pg_session.remove()
     # print('entering get_records')
     # if call_model and event_model:
     #     # Get records by date
@@ -38,5 +56,3 @@ def get_records(a, b):
     #     except IntegrityError:
     #         print('Records exist.')
     #
-    #     pg_session.remove()
-    #     db_session.remove()

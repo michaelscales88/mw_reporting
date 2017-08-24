@@ -1,54 +1,67 @@
 version: '2'
 
 services:
-  # App
   website:
-    restart: always
+    env_file:
+      - ./flask.env
     build:
       context: ..
       dockerfile: ./deployment/flask/Dockerfile
-    command: uwsgi --ini uwsgi.ini
-    env_file:
-      - ./flask.env
     volumes:
       - ../app:/var/www/app/app
       - ../database:/var/www/app/database
       - ../instance:/var/www/tmp
-
-  # Web Server
-  nginx:
+    command: uwsgi --ini uwsgi.ini
     restart: always
+
+  nginx:
     build:
       context: ..
       dockerfile: ./deployment/nginx/Dockerfile
-    command: nginx -c nginx.conf
-    volumes_from:
-      - website:ro
     links:
       - website
+      - flower
+    volumes_from:
+      - website:ro
     ports:
       - "80:80"
       - "443:443"
+    command: nginx -c nginx.conf
+    restart: always
 
-  # RabbitMQ Broker
   rabbit:
     image: rabbitmq:latest
     env_file:
       - ./flask.env
 
-  # Celery worker
-  worker:
+  flower:
     build:
       context: ..
-      dockerfile: ./deployment/celery/Dockerfile
-    restart: always
-    command: celery -A app.celery worker -l info
-    env_file:
-      - ./flask.env
-    volumes_from:
-      - website
+      dockerfile: ./deployment/flower/Dockerfile
+    environment:
+      DISCOVER_RABBITMQ: 'true'
+    depends_on:
+      - rabbit
     links:
       - website
       - rabbit
+    volumes_from:
+      - website:ro
+    command: flower
+    restart: always
+
+  worker:
+    env_file:
+      - ./flask.env
+    build:
+      context: ..
+      dockerfile: ./deployment/celery/Dockerfile
+    volumes_from:
+      - website
     depends_on:
       - rabbit
+    links:
+      - website
+      - rabbit
+    command: celery -A app.celery worker -l info
+    restart: always
