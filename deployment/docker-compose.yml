@@ -50,7 +50,7 @@ services:
     command: flower
     restart: always
 
-  worker:
+  celeryworker:
     env_file:
       - ./flask.env
     build:
@@ -65,3 +65,18 @@ services:
       - rabbit
     command: celery -A app.celery worker -l info
     restart: always
+
+  celerybeat:
+    env_file:
+      - ./flask.env
+    build:
+      context: ..
+      dockerfile: ./deployment/celery/Dockerfile
+    volumes_from:
+      - website
+    depends_on:
+      - rabbit
+    links:
+      - website
+      - rabbit
+    command: celery -A app.celery beat -l info
