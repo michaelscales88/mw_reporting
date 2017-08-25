@@ -1,10 +1,6 @@
-FROM python:latest
+FROM flask_base:latest
 MAINTAINER Michael Scales "michael.scales@g.austincc.edu"
 
+ENV base_dir /var/www/app
 
-# Install dependencies
-COPY deployment/flask/requirements.txt /var/tmp/
-RUN pip install -U pip
-RUN pip install --requirement /var/tmp/requirements.txt
-
-WORKDIR /var/www/app
+WORKDIR ${base_dir}

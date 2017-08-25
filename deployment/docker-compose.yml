@@ -2,11 +2,11 @@ version: '2'
 
 services:
   website:
+    build:
+      context: .
+      dockerfile: ./flask/Dockerfile
     env_file:
       - ./flask.env
-    build:
-      context: ..
-      dockerfile: ./deployment/flask/Dockerfile
     volumes:
       - ../app:/var/www/app/app
       - ../database:/var/www/app/database
@@ -16,8 +16,8 @@ services:
 
   nginx:
     build:
-      context: ..
-      dockerfile: ./deployment/nginx/Dockerfile
+      context: .
+      dockerfile: ./nginx/Dockerfile
     links:
       - website
       - flower
@@ -36,10 +36,10 @@ services:
 
   flower:
     build:
-      context: ..
-      dockerfile: ./deployment/flower/Dockerfile
+      context: .
+      dockerfile: ./celery/Dockerfile
     environment:
-      DISCOVER_RABBITMQ: 'true'
+      DISCOVER_RABBITMQ: "true"
     depends_on:
       - rabbit
     links:
@@ -47,15 +47,17 @@ services:
       - rabbit
     volumes_from:
       - website:ro
-    command: flower
+    ports:
+      - "5555:5555"
+    command: flower --config flower_config.py
     restart: always
 
   celeryworker:
+    build:
+      context: .
+      dockerfile: ./celery/Dockerfile
     env_file:
       - ./flask.env
-    build:
-      context: ..
-      dockerfile: ./deployment/celery/Dockerfile
     volumes_from:
       - website
     depends_on:
@@ -67,11 +69,11 @@ services:
     restart: always
 
   celerybeat:
+    build:
+      context: .
+      dockerfile: ./celery/Dockerfile
     env_file:
       - ./flask.env
-    build:
-      context: ..
-      dockerfile: ./deployment/celery/Dockerfile
     volumes_from:
       - website
     depends_on:

@@ -14,7 +14,6 @@ click
 itsdangerous
 lml
 numpy
-marshmallow-sqlalchemy
 pandas
 pyexcel
 pyexcel-io
@@ -27,3 +26,4 @@ texttable
 psycopg2
 uwsgi
 celery
+flower
