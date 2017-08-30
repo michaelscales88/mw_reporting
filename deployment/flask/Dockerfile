@@ -1,18 +1,15 @@
-FROM python:latest
+FROM flask_base:latest
 MAINTAINER Michael Scales "michael.scales@g.austincc.edu"
 
+ENV base_dir /var/www/
+ENV app_dir /var/www/app/
 
-# Install dependencies
-COPY deployment/flask/requirements.txt /var/tmp/
-RUN pip install -U pip
-RUN pip install --requirement /var/tmp/requirements.txt
-
-RUN mkdir /var/www/
-RUN mkdir /var/www/app/
+RUN mkdir ${base_dir}
+RUN mkdir ${app_dir}
 
 # Actual code is mounted as a volume
-COPY deployment/flask/uwsgi.ini /var/www/app/
-COPY deployment/flask/wsgi.py /var/www/app/
+COPY flask/uwsgi.ini ${app_dir}
+COPY flask/wsgi.py ${app_dir}
 
 # Set entrypoint directory
-WORKDIR /var/www/app
+WORKDIR ${app_dir}

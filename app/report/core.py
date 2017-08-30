@@ -8,6 +8,7 @@ from .tasks.sla_report import (
     get_mapped_class, get_records, get_cached_report,
     report_exists
 )
+from .tasks.fetch import fetch_src_records
 
 
 def server_side_processing(
@@ -96,3 +97,10 @@ def get_report(session, args):
 def get_download():
     print('printed results', flush=True)
     return excel.make_response_from_array([[1, 2], [3, 4]], "csv")
+
+
+def test_record_getter():
+    first_result = fetch_src_records.delay('call_id', 'c_call')
+    second_result = fetch_src_records.delay('event_id', 'c_event')
+    print(first_result, second_result)
+

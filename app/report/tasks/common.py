@@ -21,8 +21,15 @@ def chop_microseconds(delta):
 
 
 def results_to_dict(ptr):
-    col_names = [item[0] for item in ptr._cursor_description()]
-    return [dict(zip(col_names, row)) for row in ptr]   # Column: Cell pairs
+    try:
+        # PG results
+        col_names = [item[0] for item in ptr._cursor_description()]
+        results = ptr
+    except AttributeError:
+        # SQLAlchemy models
+        col_names = [item['name'] for item in ptr.column_descriptions]
+        results = ptr.all()
+    return [dict(zip(col_names, row)) for row in results]
 
 
 def chunks(l, chunk_size=1):
@@ -147,7 +154,7 @@ def report_exists(session, start, end, report):
             ReportCache.start == start,
             ReportCache.end == end
         )
-    ).scalar() is None
+    ).scalar() is not None
 
 
 def cache_report(session, start, end, report):

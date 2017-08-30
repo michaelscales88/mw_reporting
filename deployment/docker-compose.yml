@@ -1,57 +1,84 @@
 version: '2'
 
 services:
-  # App
   website:
-    restart: always
     build:
-      context: ..
-      dockerfile: ./deployment/flask/Dockerfile
-    command: uwsgi --ini uwsgi.ini
+      context: .
+      dockerfile: ./flask/Dockerfile
+    env_file:
+      - ./flask.env
     volumes:
       - ../app:/var/www/app/app
       - ../database:/var/www/app/database
       - ../instance:/var/www/tmp
-
-  # Web Server
-  nginx:
+    command: uwsgi --ini uwsgi.ini
     restart: always
+
+  nginx:
     build:
-      context: ..
-      dockerfile: ./deployment/nginx/Dockerfile
-    command: nginx -c nginx.conf
-    volumes_from:
-      - website:ro
+      context: .
+      dockerfile: ./nginx/Dockerfile
     links:
       - website
+      - flower
+    volumes_from:
+      - website:ro
     ports:
       - "80:80"
       - "443:443"
-
-  # RabbitMQ Broker
-  rabbit:
-    hostname: "rabbit1"
-    image: rabbitmq:latest
-    environment:
-      RABBITMQ_DEFAULT_VHOST: "/"
-      RABBITMQ_DEFAULT_USER: "user"
-      RABBITMQ_DEFAULT_PASS: "password"
-
-  # Celery worker
-  worker:
-    build:
-      context: ..
-      dockerfile: ./deployment/celery/Dockerfile
-    hostname: "worker"
+    command: nginx -c nginx.conf
     restart: always
-    command: celery -A app.celery worker -l info
+
+  rabbit:
+    image: rabbitmq:latest
+    env_file:
+      - ./flask.env
+
+  flower:
+    build:
+      context: .
+      dockerfile: ./celery/Dockerfile
     environment:
-      user: "user"
-      password: "password"
-    volumes_from:
-      - website
+      DISCOVER_RABBITMQ: "true"
+    depends_on:
+      - rabbit
     links:
       - website
       - rabbit
+    volumes_from:
+      - website:ro
+    ports:
+      - "5555:5555"
+    command: flower --config flower_config.py
+    restart: always
+
+  celeryworker:
+    build:
+      context: .
+      dockerfile: ./celery/Dockerfile
+    env_file:
+      - ./flask.env
+    volumes_from:
+      - website
     depends_on:
       - rabbit
+    links:
+      - website
+      - rabbit
+    command: celery -A app.celery worker -l info
+    restart: always
+
+  celerybeat:
+    build:
+      context: .
+      dockerfile: ./celery/Dockerfile
+    env_file:
+      - ./flask.env
+    volumes_from:
+      - website
+    depends_on:
+      - rabbit
+    links:
+      - website
+      - rabbit
+    command: celery -A app.celery beat -l info
