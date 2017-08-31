@@ -29,56 +29,30 @@ services:
     command: nginx -c nginx.conf
     restart: always
 
-  rabbit:
-    image: rabbitmq:latest
-    env_file:
-      - ./flask.env
+  rabbitmq:
+    image: 'rabbitmq:3.6'
+    networks:
+      local:
+        aliases:
+          - rabbitmq.local
 
-  flower:
-    build:
-      context: .
-      dockerfile: ./celery/Dockerfile
-    environment:
-      DISCOVER_RABBITMQ: "true"
-    depends_on:
-      - rabbit
-    links:
-      - website
-      - rabbit
-    volumes_from:
-      - website:ro
-    ports:
-      - "5555:5555"
-    command: flower --config flower_config.py
-    restart: always
+  etcd:
+    image: 'quay.io/coreos/etcd'
+    entrypoint: /usr/local/bin/etcd
+    command: [
+      '--name', 'etcd0',
+      '--advertise-client-urls','http://etcd.local:2379,http://etcd.local:4001',
+      '--listen-client-urls', 'http://0.0.0.0:2379,http://0.0.0.0:4001',
+      '--initial-advertise-peer-urls', 'http://etcd.local:2380',
+      '--listen-peer-urls', 'http://0.0.0.0:2380',
+      '--initial-cluster-token', 'etcd-cluster-1',
+      '--initial-cluster', 'etcd0=http://etcd.local:2380',
+      '--initial-cluster-state', 'new',
+    ]
 
-  celeryworker:
-    build:
-      context: .
-      dockerfile: ./celery/Dockerfile
-    env_file:
-      - ./flask.env
-    volumes_from:
-      - website
-    depends_on:
-      - rabbit
-    links:
-      - website
-      - rabbit
-    command: celery -A app.celery worker -l info
-    restart: always
-
-  celerybeat:
-    build:
-      context: .
-      dockerfile: ./celery/Dockerfile
-    env_file:
-      - ./flask.env
-    volumes_from:
-      - website
-    depends_on:
-      - rabbit
-    links:
-      - website
-      - rabbit
-    command: celery -A app.celery beat -l info
+    networks:
+      local:
+        aliases:
+          - etcd.local
+    volumes:
+      - /usr/share/ca-certificates/:/etc/ssl/certs
